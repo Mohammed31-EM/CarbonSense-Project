@@ -1,0 +1,34 @@
+{
+  "name": "carbonsense-project",
+  "version": "1.0.0",
+  "description": "**CarbonSense** is a full-stack web application designed for the **chemical and petrochemical industries** to track and manage **carbon emissions, energy consumption, water usage, and sustainability KPIs** in real time.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mohammed31-EM/CarbonSense-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mohammed31-EM/CarbonSense-Project/issues"
+  },
+  "homepage": "https://github.com/Mohammed31-EM/CarbonSense-Project#readme",
+  "dependencies": {
+    "artillery": "^2.0.23",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jest": "^30.0.5",
+    "jsx-view-engine": "^1.0.0",
+    "method-override": "^3.0.0",
+    "mongodb-memory-server": "^10.1.4",
+    "mongoose": "^8.17.0",
+    "morgan": "^1.10.1",
+    "supertest": "^7.1.4"
+  }
+}

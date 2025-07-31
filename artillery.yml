@@ -1,0 +1,58 @@
+config:
+  target: "http://localhost:3000"   # Your local server or deployed URL
+  phases:
+    - duration: 30                  # Run test for 30 seconds
+      arrivalRate: 5                # 5 virtual users per second
+      name: Warm up
+    - duration: 60
+      arrivalRate: 10               # 10 users per second
+      rampTo: 20                    # Gradually increase to 20 users/sec
+      name: Load test
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: User Sign Up and Login
+    flow:
+      - post:
+          url: "/users"
+          json:
+            name: "Test User"
+            email: "testuser{{ $randomNumber(1,10000) }}@example.com"
+            password: "password123"
+      - post:
+          url: "/users/login"
+          json:
+            email: "testuser1@example.com"
+            password: "password123"
+
+  - name: Plant CRUD Operations
+    flow:
+      - get:
+          url: "/plants"
+      - post:
+          url: "/plants"
+          json:
+            name: "Plant {{ $randomNumber(1,10000) }}"
+            location: "Manama, Bahrain"
+            operationalSince: "2023-01-01"
+            capacity: 500
+      - get:
+          url: "/plants"
+      - think: 1
+      - get:
+          url: "/plants/{{ $randomNumber(1,10) }}" # random ID test (simulate)
+        expect:
+          - statusCode: 200
+
+  - name: Report Generation
+    flow:
+      - post:
+          url: "/reports/generate"
+          json:
+            plantId: "66a1bb2d5d2a1b4c66a12345"   # Replace with a valid ID
+            periodStart: "2025-07-01"
+            periodEnd: "2025-07-30"
+        expect:
+          - statusCode: 201
