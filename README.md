@@ -61,3 +61,6 @@ This platform integrates **IoT sensor data via MQTT**, provides **interactive da
 | `/reports/sustainability`            | GET           | index         | Generate sustainability report (PDF/CSV)                           | Aggregation on `Readings` and `Equipment`                              | `Reports/Report.jsx`     |
 | `/mqtt/simulate`                     | POST          | create        | Simulate incoming IoT sensor data via MQTT                          | `Reading.create()`                                                     | none                     |
 
+## Links
+
+- **Trello:** https://trello.com/invite/b/688b0a4870f777d23ce4fe57/ATTI946ff27c6f6a4afff60b9881ef3f3a69E93AD323/carbonsense
