@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "**CarbonSense** is a full-stack web application designed for the **chemical and petrochemical industries** to track and manage **carbon emissions, energy consumption, water usage, and sustainability KPIs** in real time.",
   "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
+   "scripts": {
+  "test": "jest",
+  "start": "node server.js",
+  "dev": "nodemon server.js",
+  "load": "artillery run artillery.yml"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mohammed31-EM/CarbonSense-Project.git"
