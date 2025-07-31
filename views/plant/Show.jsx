@@ -1,19 +1,21 @@
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function Show({ plant }) {
+function Show({ plant, token }) {
   return (
-    <Layout title={plant.name}>
+    <Layout title="Plant Details">
       <h1>{plant.name}</h1>
       <p><strong>Location:</strong> {plant.location}</p>
-      <p><strong>Operational Since:</strong> {plant.operationalSince ? new Date(plant.operationalSince).toDateString() : 'N/A'}</p>
-      <p><strong>Capacity:</strong> {plant.capacity || 'Not specified'} tons/day</p>
+      <p><strong>Emission Level:</strong> {plant.emissions} tons/year</p>
 
-      <a href="/plants"><button>Back to List</button></a>
-      <a href={`/plants/${plant._id}/edit`}><button>Edit</button></a>
-      <form action={`/plants/${plant._id}?_method=DELETE`} method="POST" style={{display: 'inline'}}>
+      <a href={`/plants/${plant._id}/edit?token=${token}`}><button>Edit</button></a>
+
+      <form action={`/plants/${plant._id}?_method=DELETE&token=${token}`} method="POST" style={{ marginTop: '10px' }}>
         <button type="submit">Delete</button>
       </form>
+
+      <br/>
+      <a href={`/plants?token=${token}`}>⬅ Back to Plants</a>
     </Layout>
   );
 }
