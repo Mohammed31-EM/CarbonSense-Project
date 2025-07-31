@@ -4,18 +4,15 @@ const Layout = require('../layouts/Layout');
 function Show({ plant, token }) {
   return (
     <Layout title="Plant Details">
-      <h1>{plant.name}</h1>
-      <p><strong>Location:</strong> {plant.location}</p>
-      <p><strong>Emission Level:</strong> {plant.emissions} tons/year</p>
+      <div className="container">
+        <h1>🌱 Plant: {plant.name}</h1>
+        <p><strong>Location:</strong> {plant.location}</p>
+        <p><strong>Emissions:</strong> {plant.emissions} tons CO₂</p>
+        <p><strong>Status:</strong> {plant.status}</p>
 
-      <a href={`/plants/${plant._id}/edit?token=${token}`}><button>Edit</button></a>
-
-      <form action={`/plants/${plant._id}?_method=DELETE&token=${token}`} method="POST" style={{ marginTop: '10px' }}>
-        <button type="submit">Delete</button>
-      </form>
-
-      <br/>
-      <a href={`/plants?token=${token}`}>⬅ Back to Plants</a>
+        <a href={`/plants?token=${token}`} className="btn">⬅ Back</a>
+        <a href={`/plants/${plant._id}/edit?token=${token}`} className="btn">✏ Edit</a>
+      </div>
     </Layout>
   );
 }

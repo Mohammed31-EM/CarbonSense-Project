@@ -6,8 +6,8 @@ const methodOverride = require('method-override');
 // Import Routes
 const userRoutes = require('./controllers/auth/routeController');
 const plantRoutes = require('./controllers/plant/routeController');
-const equipmentRoutes = require('./controllers/equipment/routeController');
-const reportRoutes = require('./controllers/report/routeController');
+// const equipmentRoutes = require('./controllers/equipment/routeController');
+// const reportRoutes = require('./controllers/report/routeController');
 const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();

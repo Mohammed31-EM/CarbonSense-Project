@@ -4,19 +4,28 @@ const Layout = require('../layouts/Layout');
 function Edit({ plant, token }) {
   return (
     <Layout title="Edit Plant">
-      <h1>Edit Plant</h1>
-      <form action={`/plants/${plant._id}?_method=PUT&token=${token}`} method="POST">
-        <label>Plant Name:</label>
-        <input type="text" name="name" defaultValue={plant.name} required /><br/>
+      <div className="container">
+        <h1>✏ Edit Plant: {plant.name}</h1>
+        <form action={`/plants/${plant._id}?_method=PUT&token=${token}`} method="POST">
+          <label>Name:</label>
+          <input type="text" name="name" defaultValue={plant.name} required /><br/>
 
-        <label>Location:</label>
-        <input type="text" name="location" defaultValue={plant.location} required /><br/>
+          <label>Location:</label>
+          <input type="text" name="location" defaultValue={plant.location} required /><br/>
 
-        <label>Emission Level (tons/year):</label>
-        <input type="number" name="emissions" defaultValue={plant.emissions} required /><br/>
+          <label>Emissions (tons CO₂):</label>
+          <input type="number" name="emissions" defaultValue={plant.emissions} required /><br/>
 
-        <input type="submit" value="Update Plant" />
-      </form>
+          <label>Status:</label>
+          <select name="status" defaultValue={plant.status}>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select><br/>
+
+          <button type="submit" className="btn">Update Plant</button>
+        </form>
+        <a href={`/plants?token=${token}`} className="btn">Cancel</a>
+      </div>
     </Layout>
   );
 }

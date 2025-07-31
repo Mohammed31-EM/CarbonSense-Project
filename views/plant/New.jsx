@@ -4,19 +4,28 @@ const Layout = require('../layouts/Layout');
 function New({ token }) {
   return (
     <Layout title="Add New Plant">
-      <h1>Add New Plant</h1>
-      <form action={`/plants?token=${token}`} method="POST">
-        <label>Plant Name:</label>
-        <input type="text" name="name" required /><br/>
+      <div className="container">
+        <h1>➕ Add a New Plant</h1>
+        <form action={`/plants?token=${token}`} method="POST">
+          <label>Name:</label>
+          <input type="text" name="name" required /><br/>
 
-        <label>Location:</label>
-        <input type="text" name="location" required /><br/>
+          <label>Location:</label>
+          <input type="text" name="location" required /><br/>
 
-        <label>Emission Level (tons/year):</label>
-        <input type="number" name="emissions" required /><br/>
+          <label>Emissions (tons CO₂):</label>
+          <input type="number" name="emissions" required /><br/>
 
-        <input type="submit" value="Add Plant" />
-      </form>
+          <label>Status:</label>
+          <select name="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select><br/>
+
+          <button type="submit" className="btn">Create Plant</button>
+        </form>
+        <a href={`/plants?token=${token}`} className="btn">Cancel</a>
+      </div>
     </Layout>
   );
 }

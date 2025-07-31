@@ -5,59 +5,81 @@ const dataController = {};
 // INDEX: List all plants
 dataController.index = async (req, res, next) => {
   try {
-    // If you want user-specific plants later, add { owner: req.user._id }
+    // Optionally, you can later add { owner: req.user._id } to filter user-specific plants
     res.locals.data.plants = await Plant.find();
     next();
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // DESTROY: Delete plant by ID
 dataController.destroy = async (req, res, next) => {
   try {
-    await Plant.findOneAndDelete({ _id: req.params.id });
+    const deleted = await Plant.findOneAndDelete({ _id: req.params.id });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Plant not found' });
+    }
     next();
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // UPDATE: Update a plant by ID
 dataController.update = async (req, res, next) => {
   try {
+    const { name, location, emissions, status } = req.body;
+
     res.locals.data.plant = await Plant.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      { name, location, emissions, status },
+      { new: true, runValidators: true }
     );
+
+    if (!res.locals.data.plant) {
+      return res.status(404).json({ message: 'Plant not found' });
+    }
+
     next();
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
 // CREATE: Add a new plant
 dataController.create = async (req, res, next) => {
   try {
-    res.locals.data.plant = await Plant.create(req.body);
+    const { name, location, emissions, status } = req.body;
+
+    // Default status if not provided
+    res.locals.data.plant = await Plant.create({
+      name,
+      location,
+      emissions,
+      status: status || 'Active'
+    });
+
     next();
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
+
 
 // SHOW: Show one plant by ID
 dataController.show = async (req, res, next) => {
   try {
-    res.locals.data.plant = await Plant.findById(req.params.id);
-    if (!res.locals.data.plant) {
-      throw new Error(`Could not locate a plant with the id ${req.params.id}`);
+    const plant = await Plant.findById(req.params.id);
+    if (!plant) {
+      return res.status(400).json({ message: `No plant found with id ${req.params.id}` });
     }
+    res.locals.data.plant = plant;
     next();
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).json({ message: 'Invalid plant ID or request' });
   }
 };
 
 module.exports = dataController;
+
