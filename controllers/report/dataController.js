@@ -2,79 +2,55 @@ const Report = require('../../models/report');
 
 const dataController = {};
 
-/**
- * ✅ INDEX: Get all reports
- */
-dataController.index = async (req, res) => {
+dataController.index = async (req, res, next) => {
   try {
-    const reports = await Report.find().populate('generatedBy plantId');
-    return res.status(200).json(reports || []);
+    const reports = await Report.find().populate('plantId generatedBy');
+    res.locals.data.reports = reports;
+    next();
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
-/**
- * ✅ SHOW: Get a single report by ID
- */
-dataController.show = async (req, res) => {
+dataController.show = async (req, res, next) => {
   try {
-    const report = await Report.findById(req.params.id).populate('generatedBy plantId');
+    const report = await Report.findById(req.params.id).populate('plantId generatedBy');
     if (!report) return res.status(404).json({ message: 'Report not found' });
-    return res.status(200).json(report);
+    res.locals.data.report = report;
+    next();
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
-/**
- * ✅ CREATE: Add a new report
- */
-dataController.create = async (req, res) => {
+dataController.create = async (req, res, next) => {
   try {
-    if (!req.body.plantId || !req.body.periodStart || !req.body.periodEnd) {
-      return res.status(400).json({ message: 'plantId, periodStart, and periodEnd are required' });
-    }
-
-    const newReport = await Report.create({
-      ...req.body,
-      generatedBy: req.user ? req.user._id : null
-    });
-
-    return res.status(201).json(newReport);
+    const newReport = await Report.create(req.body);
+    res.locals.data.report = newReport;
+    next();
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
-/**
- * ✅ UPDATE: Edit a report
- */
-dataController.update = async (req, res) => {
+dataController.update = async (req, res, next) => {
   try {
-    const updatedReport = await Report.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    ).populate('generatedBy plantId');
-
-    if (!updatedReport) return res.status(404).json({ message: 'Report not found' });
-    return res.status(200).json(updatedReport);
+    const updated = await Report.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Report not found' });
+    res.locals.data.report = updated;
+    next();
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
-/**
- * ✅ DELETE: Remove a report
- */
-dataController.destroy = async (req, res) => {
+dataController.destroy = async (req, res, next) => {
   try {
-    const deletedReport = await Report.findByIdAndDelete(req.params.id);
-    if (!deletedReport) return res.status(404).json({ message: 'Report not found' });
-    return res.status(200).json({ message: 'Report successfully deleted' });
+    await Report.findByIdAndDelete(req.params.id);
+    res.locals.data.message = 'Report deleted successfully';
+    next();
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
 
