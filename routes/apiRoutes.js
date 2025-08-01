@@ -19,6 +19,9 @@ const maintenanceApiController = require('../controllers/maintenance/apiControll
 const readingDataController = require('../controllers/reading/dataController');
 const readingApiController = require('../controllers/reading/apiController');
 
+const reportDataController = require('../controllers/report/dataController');
+const reportApiController = require('../controllers/report/apiController');
+
 // ===========================
 // ✅ USER API ROUTES
 // ===========================
@@ -63,5 +66,14 @@ router.get('/readings/:id', userDataController.auth, readingDataController.show,
 router.post('/readings', userDataController.auth, readingDataController.create, readingApiController.create);
 router.put('/readings/:id', userDataController.auth, readingDataController.update, readingApiController.update);
 router.delete('/readings/:id', userDataController.auth, readingDataController.destroy, readingApiController.destroy);
+
+// ===========================
+// ✅ REPORT API ROUTES
+// ===========================
+router.get('/reports', userDataController.auth, reportDataController.index, reportApiController.index);
+router.get('/reports/:id', userDataController.auth, reportDataController.show, reportApiController.show);
+router.post('/reports', userDataController.auth, reportDataController.create, reportApiController.create);
+router.put('/reports/:id', userDataController.auth, reportDataController.update, reportApiController.update);
+router.delete('/reports/:id', userDataController.auth, reportDataController.destroy, reportApiController.destroy);
 
 module.exports = router;
