@@ -1,12 +1,12 @@
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function Index({ plants, token }) {
+function Index({ plants = [], token = '' }) {
   return (
-    <Layout title="All Plants">
+    <Layout title="All Plants" token={token}>
       <div className="container">
         <h1>🌱 All Plants</h1>
-        <a href={`/plants/new?token=${token}`} className="btn">➕ Add New Plant</a>
+        <a href={`/plants/new?token=${encodeURIComponent(token)}`} className="btn">➕ Add New Plant</a>
         <table>
           <thead>
             <tr>
@@ -18,21 +18,31 @@ function Index({ plants, token }) {
             </tr>
           </thead>
           <tbody>
-            {plants.map((plant) => (
-              <tr key={plant._id}>
-                <td>{plant.name}</td>
-                <td>{plant.location}</td>
-                <td>{plant.emissions}</td>
-                <td>{plant.status}</td>
-                <td>
-                  <a href={`/plants/${plant._id}?token=${token}`} className="btn">View</a>
-                  <a href={`/plants/${plant._id}/edit?token=${token}`} className="btn">Edit</a>
-                  <form action={`/plants/${plant._id}?_method=DELETE&token=${token}`} method="POST" style={{ display: 'inline' }}>
-                    <button type="submit" className="btn danger">Delete</button>
-                  </form>
-                </td>
+            {plants.length > 0 ? (
+              plants.map((plant) => (
+                <tr key={plant._id}>
+                  <td>{plant.name}</td>
+                  <td>{plant.location}</td>
+                  <td>{plant.emissions}</td>
+                  <td>{plant.status}</td>
+                  <td>
+                    <a href={`/plants/${plant._id}?token=${encodeURIComponent(token)}`} className="btn">View</a>
+                    <a href={`/plants/${plant._id}/edit?token=${encodeURIComponent(token)}`} className="btn">Edit</a>
+                    <form 
+                      action={`/plants/${plant._id}?_method=DELETE&token=${encodeURIComponent(token)}`} 
+                      method="POST" 
+                      style={{ display: 'inline' }}
+                    >
+                      <button type="submit" className="btn danger">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5">No plants available</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

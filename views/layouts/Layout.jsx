@@ -1,6 +1,6 @@
 const React = require('react');
 
-function Layout({ title, children }) {
+function Layout({ title, children, token }) {
   return (
     <html lang="en">
       <head>
@@ -21,9 +21,9 @@ function Layout({ title, children }) {
           <div className="container">
             <a className="logo" href="/">🌱 CarbonSense</a>
             <ul className="nav-links">
-              <li><a href="/plants">Plants</a></li>
-              <li><a href="/equipment">Equipment</a></li>
-              <li><a href="/reports">Reports</a></li>
+              <li><a href={`/plants?token=${token || ''}`}>Plants</a></li>
+              <li><a href={`/equipment?token=${token || ''}`}>Equipment</a></li>
+              <li><a href={`/reports?token=${token || ''}`}>Reports</a></li>
               <li><a href="/users/login">Login</a></li>
               <li><a href="/users">Sign Up</a></li>
             </ul>

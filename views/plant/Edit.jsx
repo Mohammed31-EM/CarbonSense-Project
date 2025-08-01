@@ -1,12 +1,15 @@
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function Edit({ plant, token }) {
+function Edit({ plant, token = '' }) {
   return (
-    <Layout title="Edit Plant">
+    <Layout title="Edit Plant" token={token}>
       <div className="container">
         <h1>✏ Edit Plant: {plant.name}</h1>
-        <form action={`/plants/${plant._id}?_method=PUT&token=${token}`} method="POST">
+        <form 
+          action={`/plants/${plant._id}?_method=PUT&token=${encodeURIComponent(token)}`} 
+          method="POST"
+        >
           <label>Name:</label>
           <input type="text" name="name" defaultValue={plant.name} required /><br/>
 
@@ -24,7 +27,7 @@ function Edit({ plant, token }) {
 
           <button type="submit" className="btn">Update Plant</button>
         </form>
-        <a href={`/plants?token=${token}`} className="btn">Cancel</a>
+        <a href={`/plants?token=${encodeURIComponent(token)}`} className="btn">Cancel</a>
       </div>
     </Layout>
   );

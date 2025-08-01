@@ -11,7 +11,7 @@ const viewController = {
   redirectToLogin(req, res, next){
     res.redirect('/users/login')
   }
-
+  
 }
 
 module.exports = viewController

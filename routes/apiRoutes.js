@@ -35,11 +35,11 @@ router.delete('/plants/:id', userDataController.auth, plantDataController.destro
 // ===========================
 // ✅ EQUIPMENT API ROUTES
 // ===========================
-// router.get('/equipment', userDataController.auth, equipmentDataController.index, equipmentApiController.index);
-// router.get('/equipment/:id', userDataController.auth, equipmentDataController.show, equipmentApiController.show);
-// router.post('/equipment', userDataController.auth, equipmentDataController.create, equipmentApiController.create);
-// router.put('/equipment/:id', userDataController.auth, equipmentDataController.update, equipmentApiController.update);
-// router.delete('/equipment/:id', userDataController.auth, equipmentDataController.destroy, equipmentApiController.destroy);
+router.get('/equipment', userDataController.auth, equipmentDataController.index, equipmentApiController.index);
+router.get('/equipment/:id', userDataController.auth, equipmentDataController.show, equipmentApiController.show);
+router.post('/equipment', userDataController.auth, equipmentDataController.create, equipmentApiController.create);
+router.put('/equipment/:id', userDataController.auth, equipmentDataController.update, equipmentApiController.update);
+router.delete('/equipment/:id', userDataController.auth, equipmentDataController.destroy, equipmentApiController.destroy);
 
 // ===========================
 // ✅ MAINTENANCE API ROUTES

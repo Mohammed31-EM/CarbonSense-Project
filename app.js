@@ -6,7 +6,7 @@ const methodOverride = require('method-override');
 // Import Routes
 const userRoutes = require('./controllers/auth/routeController');
 const plantRoutes = require('./controllers/plant/routeController');
-// const equipmentRoutes = require('./controllers/equipment/routeController');
+const equipmentRoutes = require('./controllers/equipment/routeController');
 // const reportRoutes = require('./controllers/report/routeController');
 const apiRoutes = require('./routes/apiRoutes');
 
@@ -30,7 +30,7 @@ app.use(morgan('dev')); // Logs incoming requests
 // ---------- Web Routes (Views) ----------
 app.use('/users', userRoutes);          // Signup/Login pages
 app.use('/plants', plantRoutes);        // Manage plants
-// app.use('/equipment', equipmentRoutes); // Manage equipment linked to plants
+app.use('/equipment', equipmentRoutes); // Manage equipment linked to plants
 // app.use('/reports', reportRoutes);      // Sustainability reports
 
 // ---------- API Routes (JSON responses) ----------

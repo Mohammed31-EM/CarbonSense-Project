@@ -1,48 +1,37 @@
 const RESOURCE_PATH = '/equipment';
 
 const viewController = {
-  // ✅ INDEX
-  index(req, res, next) {
+  index(req, res) {
     res.render('equipment/Index', {
-      equipments: res.locals.data.equipments || [],
+      equipments: res.locals.data.equipments,
       token: res.locals.data.token || ''
     });
   },
-
-  // ✅ SHOW
-  show(req, res, next) {
+  show(req, res) {
     res.render('equipment/Show', {
       equipment: res.locals.data.equipment,
       token: res.locals.data.token || ''
     });
   },
-
-  // ✅ EDIT
-  edit(req, res, next) {
+  edit(req, res) {
     res.render('equipment/Edit', {
       equipment: res.locals.data.equipment,
       token: res.locals.data.token || ''
     });
   },
-
-  // ✅ NEW
-  newView(req, res, next) {
+  newView(req, res) {
     res.render('equipment/New', {
       token: res.locals.data.token || ''
     });
   },
-
-  // ✅ REDIRECT HOME (after create/delete)
-  redirectHome(req, res, next) {
+  redirectHome(req, res) {
     if (res.locals.data.token) {
       res.redirect(`${RESOURCE_PATH}?token=${res.locals.data.token}`);
     } else {
       res.redirect(RESOURCE_PATH);
     }
   },
-
-  // ✅ REDIRECT SHOW (after update)
-  redirectShow(req, res, next) {
+  redirectShow(req, res) {
     if (res.locals.data.token) {
       res.redirect(`${RESOURCE_PATH}/${req.params.id}?token=${res.locals.data.token}`);
     } else {
