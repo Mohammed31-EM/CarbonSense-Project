@@ -1,11 +1,11 @@
-const viewController = {
+const viewController = { 
   /**
    * ✅ INDEX: List all readings
    */
   index(req, res) {
     res.render('reading/Index', { 
       ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
+      token: res.locals.data?.token || req.query.token || ''
     });
   },
 
@@ -15,7 +15,7 @@ const viewController = {
   show(req, res) {
     res.render('reading/Show', { 
       ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
+      token: res.locals.data?.token || req.query.token || ''
     });
   },
 
@@ -25,7 +25,7 @@ const viewController = {
   edit(req, res) {
     res.render('reading/Edit', { 
       ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
+      token: res.locals.data?.token || req.query.token || ''
     });
   },
 
@@ -35,7 +35,7 @@ const viewController = {
   newView(req, res) {
     res.render('reading/New', { 
       ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
+      token: res.locals.data?.token || req.query.token || ''
     });
   },
 
@@ -43,22 +43,16 @@ const viewController = {
    * ✅ Redirect to main readings page
    */
   redirectHome(req, res) {
-    if (res.locals.data.token) {
-      res.redirect(`/readings?token=${res.locals.data.token}`);
-    } else {
-      res.redirect('/readings');
-    }
+    const token = res.locals.data?.token || req.query.token || '';
+    res.redirect(`/readings?token=${token}`);
   },
 
   /**
    * ✅ Redirect to a specific reading details page
    */
   redirectShow(req, res) {
-    if (res.locals.data.token) {
-      res.redirect(`/readings/${req.params.id}?token=${res.locals.data.token}`);
-    } else {
-      res.redirect(`/readings/${req.params.id}`);
-    }
+    const token = res.locals.data?.token || req.query.token || '';
+    res.redirect(`/readings/${req.params.id}?token=${token}`);
   }
 };
 
