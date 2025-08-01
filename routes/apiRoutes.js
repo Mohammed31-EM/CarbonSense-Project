@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// Controllers
+// ===========================
+// ✅ Controllers
+// ===========================
 const userDataController = require('../controllers/auth/dataController');
 const userApiController = require('../controllers/auth/apiController');
 
@@ -13,6 +15,9 @@ const equipmentApiController = require('../controllers/equipment/apiController')
 
 const maintenanceDataController = require('../controllers/maintenance/dataController');
 const maintenanceApiController = require('../controllers/maintenance/apiController');
+
+const readingDataController = require('../controllers/reading/dataController');
+const readingApiController = require('../controllers/reading/apiController');
 
 // ===========================
 // ✅ USER API ROUTES
@@ -49,5 +54,14 @@ router.get('/maintenance/:id', userDataController.auth, maintenanceDataControlle
 router.post('/maintenance', userDataController.auth, maintenanceDataController.create, maintenanceApiController.create);
 router.put('/maintenance/:id', userDataController.auth, maintenanceDataController.update, maintenanceApiController.update);
 router.delete('/maintenance/:id', userDataController.auth, maintenanceDataController.destroy, maintenanceApiController.destroy);
+
+// ===========================
+// ✅ READING API ROUTES
+// ===========================
+router.get('/readings', userDataController.auth, readingDataController.index, readingApiController.index);
+router.get('/readings/:id', userDataController.auth, readingDataController.show, readingApiController.show);
+router.post('/readings', userDataController.auth, readingDataController.create, readingApiController.create);
+router.put('/readings/:id', userDataController.auth, readingDataController.update, readingApiController.update);
+router.delete('/readings/:id', userDataController.auth, readingDataController.destroy, readingApiController.destroy);
 
 module.exports = router;
