@@ -26,4 +26,3 @@ router.put('/:id', authDataController.auth, dataController.update, viewControlle
 router.delete('/:id', authDataController.auth, dataController.destroy, viewController.redirectHome);
 
 module.exports = router;
-// console.log(authDataController, dataController, viewController)

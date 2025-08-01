@@ -1,4 +1,5 @@
 const Maintenance = require('../../models/maintenance');
+const dataController = require('../plant/dataController');
 
 // INDEX: Get all maintenance records
 exports.index = async (req, res, next) => {
@@ -61,3 +62,5 @@ exports.destroy = async (req, res, next) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+module.export = dataController;
