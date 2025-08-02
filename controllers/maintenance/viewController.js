@@ -18,13 +18,21 @@ const viewController = {
   },
 
   redirectHome(req, res) {
-    const token = res.locals.data.token ? `?token=${res.locals.data.token}` : '';
-    res.redirect(`${RESOURCE_PATH}${token}`);
+    const token = req.query.token || res.locals.data.token || '';
+    if (token) {
+      res.redirect(`${RESOURCE_PATH}?token=${encodeURIComponent(token)}`);
+    } else {
+      res.redirect(RESOURCE_PATH);
+    }
   },
 
   redirectShow(req, res) {
-    const token = res.locals.data.token ? `?token=${res.locals.data.token}` : '';
-    res.redirect(`${RESOURCE_PATH}/${req.params.id}${token}`);
+    const token = req.query.token || res.locals.data.token || '';
+    if (token) {
+      res.redirect(`${RESOURCE_PATH}/${req.params.id}?token=${encodeURIComponent(token)}`);
+    } else {
+      res.redirect(`${RESOURCE_PATH}/${req.params.id}`);
+    }
   }
 };
 

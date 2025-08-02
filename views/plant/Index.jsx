@@ -1,7 +1,11 @@
+
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function Index({ plants = [], token = '' }) {
+function Index(props) {
+  // Support both 'plants' and fallback to empty array
+  const plants = props.plants || [];
+  const token = props.token || '';
   return (
     <Layout title="All Plants" token={token}>
       <div className="container">

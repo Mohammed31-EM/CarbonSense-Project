@@ -5,49 +5,53 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Generate a sustainability report for a plant
- * @param {String} plantId - Plant ID
- * @param {Date} periodStart - Start date for the report
- * @param {Date} periodEnd - End date for the report
- * @returns {Object} - Report data object
+ * Generate sustainability metrics for a plant within a given period.
+ * @param {String} plantId - The plant's ObjectId.
+ * @param {Date} periodStart - Start date for the report.
+ * @param {Date} periodEnd - End date for the report.
+ * @returns {Object} - Metrics data object.
  */
-async function generateReport(plantId, periodStart, periodEnd) {
-  // 1️⃣ Fetch plant info
+async function reportGenerator(plantId, periodStart, periodEnd) {
+  // Validate plant
   const plant = await Plant.findById(plantId);
   if (!plant) throw new Error('Plant not found');
 
-  // 2️⃣ Get readings for this plant
+  // Validate dates
+  const startDate = new Date(periodStart);
+  const endDate = new Date(periodEnd);
+  if (isNaN(startDate) || isNaN(endDate)) throw new Error('Invalid date range');
+
+  // Fetch equipment IDs for this plant
   const equipment = await Equipment.find({ plantId }).select('_id');
   const equipmentIds = equipment.map(eq => eq._id);
 
+  // Fetch readings for this plant's equipment within the time period
   const readings = await Reading.find({
     equipmentId: { $in: equipmentIds },
-    timestamp: { $gte: new Date(periodStart), $lte: new Date(periodEnd) }
+    timestamp: { $gte: startDate, $lte: endDate }
   });
 
-  // 3️⃣ Aggregate metrics
+  // Aggregate readings
   const metrics = {
-    totalEmissions: readings
-      .filter(r => r.parameter === 'emissions')
-      .reduce((sum, r) => sum + r.value, 0),
-    totalEnergy: readings
-      .filter(r => r.parameter === 'energy')
-      .reduce((sum, r) => sum + r.value, 0),
-    waterUsage: readings
-      .filter(r => r.parameter === 'water')
-      .reduce((sum, r) => sum + r.value, 0),
-    waste: readings
-      .filter(r => r.parameter === 'waste')
-      .reduce((sum, r) => sum + r.value, 0),
+    totalEmissions: readings.filter(r => r.parameter === 'emissions').reduce((sum, r) => sum + r.value, 0),
+    totalEnergy: readings.filter(r => r.parameter === 'energy').reduce((sum, r) => sum + r.value, 0),
+    waterUsage: readings.filter(r => r.parameter === 'water').reduce((sum, r) => sum + r.value, 0),
+    waste: readings.filter(r => r.parameter === 'waste').reduce((sum, r) => sum + r.value, 0),
   };
 
-  // Calculate carbon footprint (basic example formula)
+  // Calculate carbon footprint (basic formula)
   metrics.carbonFootprint = metrics.totalEmissions * 5;
 
-  // 4️⃣ Optionally generate a text file for the report
+  // Ensure reports directory exists
+  const reportsDir = path.join(__dirname, '../reports');
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
+  }
+
+  // Generate a text file report (async)
   const reportContent = `
     Sustainability Report - ${plant.name}
-    Period: ${new Date(periodStart).toDateString()} to ${new Date(periodEnd).toDateString()}
+    Period: ${startDate.toDateString()} to ${endDate.toDateString()}
     Location: ${plant.location}
 
     Total Emissions: ${metrics.totalEmissions} tons CO₂
@@ -57,10 +61,48 @@ async function generateReport(plantId, periodStart, periodEnd) {
     Carbon Footprint: ${metrics.carbonFootprint} CO₂-e
   `;
 
-  const filePath = path.join(__dirname, `../reports/report_${plantId}_${Date.now()}.txt`);
-  fs.writeFileSync(filePath, reportContent);
+  const filePath = path.join(reportsDir, `report_${plantId}_${Date.now()}.txt`);
+  try {
+    await fs.promises.writeFile(filePath, reportContent);
+  } catch (err) {
+    throw new Error('Failed to write report file: ' + err.message);
+  }
 
-  return { plantId, metrics, filePath };
+  return { ...metrics, filePath };
 }
 
-module.exports = { generateReport };
+module.exports = reportGenerator;
+
+// --- SAMPLE EXPRESS ROUTE FOR REPORT GENERATION ---
+// Add this to your routes/apiRoutes.js or similar file:
+/*
+const express = require('express');
+const router = express.Router();
+const reportGenerator = require('../utility/reportGenerator');
+
+// POST /api/reports/generate
+router.post('/api/reports/generate', async (req, res) => {
+  try {
+    const { plantId, periodStart, periodEnd } = req.body;
+    const report = await reportGenerator(plantId, periodStart, periodEnd);
+    res.json(report);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+module.exports = router;
+*/
+
+// --- SAMPLE FRONTEND FETCH FUNCTION ---
+// Use this in your React/JSX view to call the backend route:
+/*
+async function generateReport(plantId, periodStart, periodEnd) {
+  const response = await fetch('/api/reports/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plantId, periodStart, periodEnd })
+  });
+  const data = await response.json();
+  // Handle data (show metrics, link to file, etc.)
+}
+*/

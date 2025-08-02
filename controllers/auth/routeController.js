@@ -1,25 +1,27 @@
 const express = require('express');
 const router = express.Router();
+
 const dataController = require('./dataController');
 const viewController = require('./viewController');
-const plantsViewController = require('../plant/viewController'); 
+const plantViewController = require('../plant/viewController');
 
-// SIGNUP: Create a new user, then redirect to login
-router.post('/', dataController.createUser, viewController.redirectToLogin);
-
-// SIGNUP PAGE
+// ✅ SIGNUP PAGE
 router.get('/', viewController.signUp);
+router.get('/signup', viewController.signUp); // optional alias
 
-// LOGIN: Authenticate user, then redirect to plants
-router.post('/login', dataController.loginUser, plantsViewController.redirectHome);
-
-// LOGIN PAGE
+// ✅ LOGIN PAGE
 router.get('/login', viewController.signIn);
 
-// UPDATE: Update user by ID
+// ✅ SIGNUP (Create a new user)
+router.post('/', dataController.createUser, viewController.redirectToLogin);
+
+// ✅ LOGIN (Authenticate user and redirect to plants)
+router.post('/login', dataController.loginUser, plantViewController.redirectHome);
+
+// ✅ UPDATE user by ID
 router.put('/:id', dataController.updateUser);
 
-// DELETE: Delete user (auth required)
+// ✅ DELETE user (requires auth)
 router.delete('/:id', dataController.auth, dataController.deleteUser);
 
 module.exports = router;

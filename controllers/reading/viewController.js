@@ -43,16 +43,24 @@ const viewController = {
    * ✅ Redirect to main readings page
    */
   redirectHome(req, res) {
-    const token = res.locals.data?.token || req.query.token || '';
-    res.redirect(`/readings?token=${token}`);
+    const token = req.query.token || res.locals.data?.token || '';
+    if (token) {
+      res.redirect(`/readings?token=${encodeURIComponent(token)}`);
+    } else {
+      res.redirect('/readings');
+    }
   },
 
   /**
    * ✅ Redirect to a specific reading details page
    */
   redirectShow(req, res) {
-    const token = res.locals.data?.token || req.query.token || '';
-    res.redirect(`/readings/${req.params.id}?token=${token}`);
+    const token = req.query.token || res.locals.data?.token || '';
+    if (token) {
+      res.redirect(`/readings/${req.params.id}?token=${encodeURIComponent(token)}`);
+    } else {
+      res.redirect(`/readings/${req.params.id}`);
+    }
   }
 };
 

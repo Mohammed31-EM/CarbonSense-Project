@@ -76,4 +76,16 @@ router.post('/reports', userDataController.auth, reportDataController.create, re
 router.put('/reports/:id', userDataController.auth, reportDataController.update, reportApiController.update);
 router.delete('/reports/:id', userDataController.auth, reportDataController.destroy, reportApiController.destroy);
 
+// --- REPORT GENERATION ENDPOINT ---
+const reportGenerator = require('../utility/reportGenerator');
+router.post('/api/reports/generate', async (req, res) => {
+  try {
+    const { plantId, periodStart, periodEnd } = req.body;
+    const report = await reportGenerator(plantId, periodStart, periodEnd);
+    res.json(report);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 module.exports = router;

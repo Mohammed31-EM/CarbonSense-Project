@@ -43,8 +43,9 @@ const viewController = {
    * ✅ Redirect to main reports page
    */
   redirectHome(req, res) {
-    if (res.locals.data.token) {
-      res.redirect(`/reports?token=${res.locals.data.token}`);
+    const token = req.query.token || res.locals.data.token || '';
+    if (token) {
+      res.redirect(`/reports?token=${encodeURIComponent(token)}`);
     } else {
       res.redirect('/reports');
     }
@@ -54,8 +55,9 @@ const viewController = {
    * ✅ Redirect to a specific report details page
    */
   redirectShow(req, res) {
-    if (res.locals.data.token) {
-      res.redirect(`/reports/${req.params.id}?token=${res.locals.data.token}`);
+    const token = req.query.token || res.locals.data.token || '';
+    if (token) {
+      res.redirect(`/reports/${req.params.id}?token=${encodeURIComponent(token)}`);
     } else {
       res.redirect(`/reports/${req.params.id}`);
     }

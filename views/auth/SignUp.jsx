@@ -1,9 +1,9 @@
 const React = require('react')
 const Layout = require('../layouts/Layout')
 
-function SignUp (props) {
-    return(
-        <Layout>
+function SignUp () {
+    return (
+        <Layout title="Sign Up">
             <h1>📝 Sign Up</h1>
             
             <h2 className="text-center mb-3">Join The Greatest Of All Time!</h2>
@@ -46,14 +46,14 @@ function SignUp (props) {
                     <button type="submit" className="btn btn-primary">
                         📝 Create Account
                     </button>
-                    <a href="/users/signin" className="btn btn-secondary">
+                    <a href="/users/login" className="btn btn-secondary">
                         🔐 Sign In Instead
                     </a>
                 </div>
             </form>
             
             <div className="text-center mt-3">
-                <p>Already have an account? <a href="/users/signin">Sign in here</a></p>
+                <p>Already have an account? <a href="/users/login">Sign in here</a></p>
             </div>
         </Layout>
     )

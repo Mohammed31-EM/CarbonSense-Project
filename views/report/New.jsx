@@ -2,42 +2,67 @@ const React = require('react');
 const Layout = require('../layouts/Layout');
 
 function New({ plants, token }) {
+  const [result, setResult] = React.useState(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const plantId = form.plantId.value;
+    const periodStart = form.periodStart.value;
+    const periodEnd = form.periodEnd.value;
+    setResult('Generating...');
+    try {
+      const response = await fetch('/api/reports/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plantId, periodStart, periodEnd })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setResult(data);
+      } else {
+        setResult(data.error || 'Error generating report');
+      }
+    } catch (err) {
+      setResult('Error: ' + err.message);
+    }
+  };
   return (
     <Layout title="Generate New Report" token={token}>
       <div className="container">
         <h1>➕ Generate Sustainability Report</h1>
-        <form action={`/reports?token=${token}`} method="POST">
+        <form onSubmit={handleSubmit}>
           <label>Plant:</label>
           <select name="plantId" required>
             {plants.map((plant) => (
               <option key={plant._id} value={plant._id}>{plant.name}</option>
             ))}
           </select><br/>
-
           <label>Period Start:</label>
           <input type="date" name="periodStart" required /><br/>
-
           <label>Period End:</label>
           <input type="date" name="periodEnd" required /><br/>
-
-          <label>Total Emissions (tons):</label>
-          <input type="number" name="metrics.totalEmissions" step="0.01" /><br/>
-
-          <label>Total Energy (kWh):</label>
-          <input type="number" name="metrics.totalEnergy" step="0.01" /><br/>
-
-          <label>Water Usage (m³):</label>
-          <input type="number" name="metrics.waterUsage" step="0.01" /><br/>
-
-          <label>Waste (kg):</label>
-          <input type="number" name="metrics.waste" step="0.01" /><br/>
-
-          <label>Carbon Footprint (CO₂eq):</label>
-          <input type="number" name="metrics.carbonFootprint" step="0.01" /><br/>
-
           <button type="submit" className="btn">Generate Report</button>
         </form>
         <a href={`/reports?token=${token}`} className="btn">Cancel</a>
+        {result && (
+          <div className="report-result" style={{ marginTop: '2em' }}>
+            {typeof result === 'string' ? (
+              <p>{result}</p>
+            ) : (
+              <div>
+                <h3>Report Generated!</h3>
+                <ul>
+                  <li>Total Emissions: {result.totalEmissions} tons CO₂</li>
+                  <li>Total Energy: {result.totalEnergy} kWh</li>
+                  <li>Water Usage: {result.waterUsage} L</li>
+                  <li>Waste: {result.waste} kg</li>
+                  <li>Carbon Footprint: {result.carbonFootprint} CO₂-e</li>
+                  <li>File: <a href={result.filePath} target="_blank" rel="noopener noreferrer">Download Report</a></li>
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Layout>
   );

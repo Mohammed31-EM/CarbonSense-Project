@@ -1,9 +1,9 @@
 const React = require('react')
 const Layout = require('../layouts/Layout')
 
-function SignIn (props) {
-    return(
-        <Layout>
+function SignIn () {
+    return (
+        <Layout title="Sign In">
             <h1>🔐 Sign In</h1>
             
             <h2 className="text-center mb-3">Welcome Back!</h2>
