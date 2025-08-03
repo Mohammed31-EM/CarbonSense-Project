@@ -1,8 +1,9 @@
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function New({ plants, token }) {
+function New({ plants = [], token }) {
   const [result, setResult] = React.useState(null);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
@@ -26,6 +27,20 @@ function New({ plants, token }) {
       setResult('Error: ' + err.message);
     }
   };
+
+  // 🚨 Show message if no plants exist
+  if (!plants.length) {
+    return (
+      <Layout title="Generate New Report" token={token}>
+        <div className="container">
+          <h2>No plants found in the system. Please add a plant first.</h2>
+          <a href={`/plants/new?token=${token}`} className="btn">Add Plant</a>
+          <a href={`/reports?token=${token}`} className="btn">Back to Reports</a>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="Generate New Report" token={token}>
       <div className="container">
@@ -57,7 +72,9 @@ function New({ plants, token }) {
                   <li>Water Usage: {result.waterUsage} L</li>
                   <li>Waste: {result.waste} kg</li>
                   <li>Carbon Footprint: {result.carbonFootprint} CO₂-e</li>
-                  <li>File: <a href={result.filePath} target="_blank" rel="noopener noreferrer">Download Report</a></li>
+                  {result.filePath &&
+                    <li>File: <a href={result.filePath} target="_blank" rel="noopener noreferrer">Download Report</a></li>
+                  }
                 </ul>
               </div>
             )}

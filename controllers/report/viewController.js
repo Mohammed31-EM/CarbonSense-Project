@@ -1,7 +1,7 @@
+const Plant = require('../../models/plant');
+
 const viewController = { 
-  /**
-   * ✅ INDEX: List all reports
-   */
+  // INDEX: List all reports
   index(req, res) {
     res.render('report/Index', { 
       ...res.locals.data,
@@ -9,9 +9,7 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ SHOW: Show single report
-   */
+  // SHOW: Show single report
   show(req, res) {
     res.render('report/Show', { 
       ...res.locals.data,
@@ -19,9 +17,7 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ EDIT: Show edit report form
-   */
+  // EDIT: Show edit report form
   edit(req, res) {
     res.render('report/Edit', { 
       ...res.locals.data,
@@ -29,19 +25,18 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ NEW: Show form to create a new report
-   */
-  newView(req, res) {
-    res.render('report/New', { 
-      ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
-    });
+  // NEW: Show form to create a new report (NOW fetches plants)
+  async newView(req, res) {
+    try {
+      const plants = await Plant.find().lean();
+      const token = res.locals.data?.token || req.query.token || '';
+      res.render('report/New', { plants, token });
+    } catch (err) {
+      res.status(500).send('Error loading plants: ' + err.message);
+    }
   },
 
-  /**
-   * ✅ Redirect to main reports page
-   */
+  // Redirect to main reports page
   redirectHome(req, res) {
     const token = req.query.token || res.locals.data.token || '';
     if (token) {
@@ -51,9 +46,7 @@ const viewController = {
     }
   },
 
-  /**
-   * ✅ Redirect to a specific report details page
-   */
+  // Redirect to a specific report details page
   redirectShow(req, res) {
     const token = req.query.token || res.locals.data.token || '';
     if (token) {

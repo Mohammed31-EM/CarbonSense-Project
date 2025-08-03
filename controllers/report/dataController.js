@@ -5,9 +5,6 @@ const Plant = mongoose.model('Plant');
 
 const dataController = {};
 
-/**
- * ✅ GET all reports with populated plant name
- */
 dataController.index = async (req, res, next) => {
   try {
     let reports = await Report.find()
@@ -31,9 +28,6 @@ dataController.index = async (req, res, next) => {
   }
 };
 
-/**
- * ✅ GET single report
- */
 dataController.show = async (req, res, next) => {
   try {
     const report = await Report.findById(req.params.id)
@@ -57,9 +51,7 @@ dataController.show = async (req, res, next) => {
   }
 };
 
-/**
- * ✅ CREATE report
- */
+
 dataController.create = async (req, res, next) => {
   try {
     let { plantId, periodStart, periodEnd, metrics } = req.body;
@@ -74,7 +66,7 @@ dataController.create = async (req, res, next) => {
     if (!periodStart) periodStart = new Date();
     if (!periodEnd) periodEnd = new Date();
 
-    // Generate metrics or fallback
+ 
     if (!metrics) {
       try {
         metrics = await reportGenerator.generateReport(plantId, periodStart, periodEnd);
@@ -117,9 +109,7 @@ dataController.create = async (req, res, next) => {
   }
 };
 
-/**
- * ✅ UPDATE report
- */
+
 dataController.update = async (req, res, next) => {
   try {
     const updatedReport = await Report.findByIdAndUpdate(
@@ -142,9 +132,6 @@ dataController.update = async (req, res, next) => {
   }
 };
 
-/**
- * ✅ DELETE report
- */
 dataController.destroy = async (req, res, next) => {
   try {
     const deletedReport = await Report.findByIdAndDelete(req.params.id);
