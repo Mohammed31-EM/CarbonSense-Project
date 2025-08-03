@@ -61,6 +61,14 @@ dataController.create = async (req, res) => {
       status: req.body.status || status
     });
 
+    // --- MQTT Publish ---
+    try {
+      const { publishReading } = require('../../utility/mqttClient');
+      publishReading(newReading);
+    } catch (err) {
+      console.warn('MQTT publish failed:', err.message);
+    }
+
     return res.status(201).json(newReading);
   } catch (error) {
     return res.status(400).json({ message: error.message });

@@ -1,78 +1,117 @@
+// tests/user.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../app');
-const server = app.listen(8081, () => console.log('CarbonSense Testing on PORT 8081'));
-
 const User = require('../models/user');
-const Plant = require('../models/plant');
-const Report = require('../models/report');
 
 let mongoServer;
-let token, plant;
+let token;
+
+// --- Helper: Register and Login a user, return token
+async function registerAndLoginUser(userData = {
+  name: 'Test User', email: 'test@example.com', password: 'testpass123'
+}) {
+  await request(app).post('/api/users').send(userData);
+  const res = await request(app).post('/api/users/login').send({
+    email: userData.email,
+    password: userData.password,
+  });
+  return res.body.token;
+}
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  await mongoose.connect(mongoServer.getUri());
 });
 
 afterAll(async () => {
-  await mongoose.connection.close();
+  await mongoose.disconnect();
   await mongoServer.stop();
-  server.close();
 });
 
 afterEach(async () => {
   await User.deleteMany({});
-  await Plant.deleteMany({});
-  await Report.deleteMany({});
 });
 
-describe('🌍 CarbonSense API Tests', () => {
-
+describe('👤 User API', () => {
   beforeEach(async () => {
-    const user = new User({
-      name: 'Admin User',
-      email: 'admin@example.com',
-      password: 'password123'
-    });
-    await user.save();
-    token = await user.generateAuthToken();
-
-    plant = await Plant.create({
-      name: 'Bahrain Plant',
-      location: 'Manama',
-      emissions: 100
-    });
+    token = await registerAndLoginUser();
   });
 
-  // ✅ REPORT API FIXED TEST
-  describe('REPORT API', () => {
-    test('should generate a sustainability report', async () => {
-      const reportData = {
-        plantId: plant._id.toString(),
-        periodStart: '2025-01-01',
-        periodEnd: '2025-12-31',
-        metrics: {
-          totalEmissions: 200,
-          totalEnergy: 500,
-          waterUsage: 100,
-          waste: 50,
-          carbonFootprint: 1000
-        }
-      };
+  it('should register a new user', async () => {
+    const res = await request(app)
+      .post('/api/users')
+      .send({
+        name: 'Another User',
+        email: 'another@example.com',
+        password: 'anotherpass123'
+      })
+      .expect(201);
 
-      const response = await request(app)
-        .post('/api/reports')
-        .set('Authorization', `Bearer ${token}`)
-        .send(reportData)
-        .expect(201);
+    expect(res.body).toHaveProperty('user');
+    expect(res.body.user).not.toHaveProperty('password');
+    expect(res.body).toHaveProperty('token');
+  });
 
-      expect(response.body).toHaveProperty('plantId', plant._id.toString());
-      expect(response.body.metrics.totalEmissions).toBe(200);
-    });
+  it('should not allow duplicate registration', async () => {
+    await request(app)
+      .post('/api/users')
+      .send({ name: 'Dup', email: 'dup@example.com', password: 'pass' });
+
+    const res = await request(app)
+      .post('/api/users')
+      .send({ name: 'Dup', email: 'dup@example.com', password: 'pass' })
+      .expect(400);
+
+    // Should match "already exists" or "User already exists"
+    expect(res.body.message).toMatch(/already exists/i);
+  });
+
+  it('should login a user and receive a token', async () => {
+    // Register a new user for login
+    await request(app)
+      .post('/api/users')
+      .send({ name: 'Log', email: 'log@example.com', password: 'testpass' });
+
+    const res = await request(app)
+      .post('/api/users/login')
+      .send({ email: 'log@example.com', password: 'testpass' })
+      .expect(200);
+
+    expect(res.body).toHaveProperty('user');
+    expect(res.body).toHaveProperty('token');
+  });
+
+  it('should not login with wrong password', async () => {
+    await request(app)
+      .post('/api/users')
+      .send({ name: 'No', email: 'no@example.com', password: 'rightpass' });
+
+    const res = await request(app)
+      .post('/api/users/login')
+      .send({ email: 'no@example.com', password: 'wrongpass' })
+      .expect(400);
+
+    expect(res.body.message).toMatch(/invalid/i);
+  });
+
+  it('should get user profile with valid token', async () => {
+    const res = await request(app)
+      .get('/api/users/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(res.body.user).toHaveProperty('email', 'test@example.com');
+    expect(res.body.user).not.toHaveProperty('password');
+  });
+
+  it('should fail to get profile with invalid token', async () => {
+    const res = await request(app)
+      .get('/api/users/profile')
+      .set('Authorization', 'Bearer badtoken')
+      .expect(401);
+
+    expect(res.text).toMatch(/not authorized|token/i);
   });
 });

@@ -1,3 +1,4 @@
+// tests/equipment.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -9,15 +10,23 @@ const Plant = require('../models/plant');
 const Equipment = require('../models/equipment');
 
 let mongoServer;
-let token;
-let plant;
+let token, userId, plant;
+
+async function registerAndLogin(email = 'admin@cs.com', password = 'password123') {
+  // Register
+  await request(app)
+    .post('/api/users')
+    .send({ name: 'Admin User', email, password });
+  // Login
+  const res = await request(app)
+    .post('/api/users/login')
+    .send({ email, password });
+  return { token: res.body.token, user: res.body.user };
+}
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect(mongoServer.getUri());
 });
 
 afterAll(async () => {
@@ -31,21 +40,18 @@ beforeEach(async () => {
   await Plant.deleteMany({});
   await Equipment.deleteMany({});
 
-  // ✅ Create user and login to get token
-  const user = new User({
-    name: 'Admin User',
-    email: 'admin@cs.com',
-    password: 'password123',
-  });
-  await user.save();
-  token = await user.generateAuthToken();
+  // Register and login, get userId and JWT
+  const auth = await registerAndLogin();
+  token = `Bearer ${auth.token}`;
+  userId = auth.user._id;
 
-  // ✅ Create a plant to attach equipment
+  // Create plant with ownership
   plant = await Plant.create({
     name: 'Plant A',
     location: 'Bahrain',
     emissions: 120,
     status: 'Active',
+    user: userId
   });
 });
 
@@ -53,7 +59,7 @@ describe('Equipment API Tests', () => {
   test('should create equipment successfully', async () => {
     const response = await request(app)
       .post('/api/equipment')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .send({
         name: 'Compressor-1',
         type: 'Compressor',
@@ -72,7 +78,7 @@ describe('Equipment API Tests', () => {
 
     const response = await request(app)
       .get('/api/equipment')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
@@ -88,7 +94,7 @@ describe('Equipment API Tests', () => {
 
     const response = await request(app)
       .get(`/api/equipment/${equipment._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(response.body).toHaveProperty('name', 'Valve-1');
@@ -107,7 +113,7 @@ describe('Equipment API Tests', () => {
 
     const response = await request(app)
       .put(`/api/equipment/${equipment._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .send(updateData)
       .expect(200);
 
@@ -124,7 +130,7 @@ describe('Equipment API Tests', () => {
 
     const response = await request(app)
       .delete(`/api/equipment/${equipment._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(response.body).toHaveProperty('message', 'Equipment deleted successfully');
@@ -138,6 +144,6 @@ describe('Equipment API Tests', () => {
       .get('/api/equipment')
       .expect(401);
 
-    expect(response.text).toBe('Not authorized');
+    expect(response.text).toBe('Token missing');
   });
 });

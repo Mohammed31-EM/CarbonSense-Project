@@ -2,18 +2,29 @@ const User = require('../../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// 🔐 Middleware: API Auth (Header-based)
+// HARDCODED SECRET for all JWT ops:
+const JWT_SECRET = 'secret'; // <<--- CHANGE BEFORE PRODUCTION!
+
+// Helper: Always extract ONLY the JWT (whether or not it's prefixed with 'Bearer ')
+function extractBearerToken(authHeaderOrToken) {
+  if (!authHeaderOrToken) return null;
+  return authHeaderOrToken.startsWith('Bearer ') ? authHeaderOrToken.slice(7) : authHeaderOrToken;
+}
+
+// 🔐 Middleware: API Auth (Header OR Query)
 exports.auth = async (req, res, next) => {
   try {
-    // Check header first, then query param
-    const token =
-      req.header('Authorization')?.replace('Bearer ', '') ||
-      req.query.token;
+    let token =
+      extractBearerToken(req.header('Authorization')) ||
+      extractBearerToken(req.query.token);
+
     if (!token) return res.status(401).send('Token missing');
 
-    const decoded = jwt.verify(token, 'secret');
+    // Use HARDCODED secret for verification
+    const decoded = jwt.verify(token, JWT_SECRET);
+
     const user = await User.findById(decoded._id);
-    if (!user) throw new Error('User not found');
+    if (!user) return res.status(401).send('User not found');
 
     req.user = user;
     res.locals.data = { token, user };
@@ -36,7 +47,12 @@ exports.createUser = async (req, res) => {
     const user = new User({ name, email, password });
     await user.save();
 
-    const token = await user.generateAuthToken();
+    // Issue token with hardcoded secret (1h expiry)
+    const token = jwt.sign(
+      { _id: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
     res.status(201).json({ user, token });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -51,7 +67,12 @@ exports.loginUser = async (req, res, next) => {
     if (!user || !(await bcrypt.compare(password, user.password)))
       return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = await user.generateAuthToken();
+    // Issue token with hardcoded secret (1h expiry)
+    const token = jwt.sign(
+      { _id: user._id, email: user.email },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
     res.locals.data = { user, token };
     return next();
   } catch (err) {

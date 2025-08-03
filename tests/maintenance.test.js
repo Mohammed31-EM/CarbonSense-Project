@@ -1,3 +1,4 @@
+// tests/maintenance.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -10,7 +11,14 @@ const Equipment = require('../models/equipment');
 const Maintenance = require('../models/maintenance');
 
 let mongoServer;
-let token, user, plant, equipment;
+let token, userId, plant, equipment;
+
+// Helper to register and login user, returns JWT and userId
+async function registerAndLogin(email = 'john@test.com', password = 'pass123') {
+  await request(app).post('/api/users').send({ name: 'John', email, password });
+  const res = await request(app).post('/api/users/login').send({ email, password });
+  return { token: res.body.token, userId: res.body.user._id };
+}
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
@@ -29,20 +37,20 @@ beforeEach(async () => {
   await Equipment.deleteMany({});
   await Maintenance.deleteMany({});
 
-  // Create user
-  user = new User({ name: 'John', email: 'john@test.com', password: 'pass123' });
-  await user.save();
-  token = await user.generateAuthToken();
+  // Create user and login for token
+  const auth = await registerAndLogin();
+  token = `Bearer ${auth.token}`;
+  userId = auth.userId;
 
-  // Create plant
+  // Create plant and equipment (attach to user)
   plant = await Plant.create({
     name: 'Plant A',
     location: 'Site 1',
     emissions: 100,
-    status: 'Active'
+    status: 'Active',
+    user: userId
   });
 
-  // Create equipment
   equipment = await Equipment.create({
     name: 'Pump A',
     type: 'Pump',
@@ -51,11 +59,10 @@ beforeEach(async () => {
 });
 
 describe('Maintenance API Tests', () => {
-
   test('should create a new maintenance log successfully', async () => {
     const response = await request(app)
       .post('/api/maintenance')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .send({
         equipmentId: equipment._id,
         plantId: plant._id,
@@ -79,7 +86,7 @@ describe('Maintenance API Tests', () => {
 
     const response = await request(app)
       .get('/api/maintenance')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
@@ -96,7 +103,7 @@ describe('Maintenance API Tests', () => {
 
     const response = await request(app)
       .get(`/api/maintenance/${log._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(response.body.tasksPerformed).toContain('Inspect Motor');
@@ -108,7 +115,7 @@ describe('Maintenance API Tests', () => {
 
     const response = await request(app)
       .get(`/api/maintenance/${fakeId}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(400);
 
     expect(response.body).toHaveProperty('message');
@@ -124,7 +131,7 @@ describe('Maintenance API Tests', () => {
 
     const response = await request(app)
       .put(`/api/maintenance/${log._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .send({
         tasksPerformed: ['Replace Seal'],
         status: 'Completed'
@@ -145,7 +152,7 @@ describe('Maintenance API Tests', () => {
 
     const response = await request(app)
       .delete(`/api/maintenance/${log._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(response.body).toHaveProperty('message', 'Maintenance record deleted successfully');
@@ -159,6 +166,6 @@ describe('Maintenance API Tests', () => {
       .get('/api/maintenance')
       .expect(401);
 
-    expect(response.text).toBe('Not authorized');
+    expect(response.text).toBe('Token missing');
   });
 });

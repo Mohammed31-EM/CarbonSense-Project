@@ -26,40 +26,36 @@ afterAll(async () => {
   server.close();
 });
 
-afterEach(async () => {
+beforeEach(async () => {
   await User.deleteMany({});
   await Plant.deleteMany({});
   await Equipment.deleteMany({});
   await Reading.deleteMany({});
+
+  // Create a test user and log in
+  user = await User.create({
+    name: 'Test User',
+    email: 'testuser@example.com',
+    password: 'password123'
+  });
+  token = await User.login('testuser@example.com', 'password123');
+  token = `Bearer ${token}`;
+
+  // Create plant and equipment
+  plant = await Plant.create({
+    name: 'Test Plant',
+    location: 'Bahrain',
+    emissions: 100
+  });
+
+  equipment = await Equipment.create({
+    name: 'Sensor 1',
+    type: 'IoT Sensor',
+    plantId: plant._id
+  });
 });
 
 describe('📊 Reading API Tests', () => {
-
-  beforeEach(async () => {
-    // Create test user
-    user = new User({
-      name: 'Test User',
-      email: 'testuser@example.com',
-      password: 'password123'
-    });
-    await user.save();
-    token = await user.generateAuthToken();
-
-    // Create plant and equipment
-    plant = await Plant.create({
-      name: 'Test Plant',
-      location: 'Bahrain',
-      emissions: 100
-    });
-
-    equipment = await Equipment.create({
-      name: 'Sensor 1',
-      type: 'IoT Sensor',
-      plantId: plant._id
-    });
-  });
-
-  // ✅ POST
   test('✅ should create a new reading successfully', async () => {
     const data = {
       equipmentId: equipment._id,
@@ -69,7 +65,7 @@ describe('📊 Reading API Tests', () => {
 
     const response = await request(app)
       .post('/api/readings')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .send(data)
       .expect(201);
 
@@ -77,9 +73,8 @@ describe('📊 Reading API Tests', () => {
     expect(response.body).toHaveProperty('value', 200);
   });
 
-  // 🚫 POST without token
   test('🚫 should return 401 without token', async () => {
-    await request(app)
+    const response = await request(app)
       .post('/api/readings')
       .send({
         equipmentId: equipment._id,
@@ -87,9 +82,10 @@ describe('📊 Reading API Tests', () => {
         value: 50
       })
       .expect(401);
+
+    expect(response.text).toMatch(/token/i); // generic token error
   });
 
-  // ✅ GET all readings
   test('✅ should return all readings for authenticated user', async () => {
     await Reading.create([
       { equipmentId: equipment._id, parameter: 'energy', value: 150 },
@@ -98,14 +94,13 @@ describe('📊 Reading API Tests', () => {
 
     const response = await request(app)
       .get('/api/readings')
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThanOrEqual(2);
   });
 
-  // ✅ GET reading by ID
   test('✅ should return a specific reading', async () => {
     const reading = await Reading.create({
       equipmentId: equipment._id,
@@ -115,26 +110,24 @@ describe('📊 Reading API Tests', () => {
 
     const response = await request(app)
       .get(`/api/readings/${reading._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(response.body).toHaveProperty('parameter', 'waste');
     expect(response.body).toHaveProperty('value', 10);
   });
 
-  // 🚫 GET invalid ID → should now expect 404
   test('🚫 should return 404 for invalid/non-existent ID', async () => {
     const fakeId = new mongoose.Types.ObjectId();
 
     const response = await request(app)
       .get(`/api/readings/${fakeId}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(404);
 
     expect(response.body).toHaveProperty('message');
   });
 
-  // ✅ PUT update reading
   test('✅ should update a reading successfully', async () => {
     const reading = await Reading.create({
       equipmentId: equipment._id,
@@ -144,14 +137,13 @@ describe('📊 Reading API Tests', () => {
 
     const response = await request(app)
       .put(`/api/readings/${reading._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .send({ value: 300 })
       .expect(200);
 
     expect(response.body).toHaveProperty('value', 300);
   });
 
-  // ✅ DELETE reading
   test('✅ should delete a reading successfully', async () => {
     const reading = await Reading.create({
       equipmentId: equipment._id,
@@ -161,7 +153,7 @@ describe('📊 Reading API Tests', () => {
 
     const response = await request(app)
       .delete(`/api/readings/${reading._id}`)
-      .set('Authorization', `Bearer ${token}`)
+      .set('Authorization', token)
       .expect(200);
 
     expect(response.body).toHaveProperty('message', 'Reading deleted successfully');
@@ -170,16 +162,17 @@ describe('📊 Reading API Tests', () => {
     expect(deletedReading).toBeNull();
   });
 
-  // 🚫 DELETE without token
-  test('🚫 should return 401 without token', async () => {
+  test('🚫 should return 401 without token (delete)', async () => {
     const reading = await Reading.create({
       equipmentId: equipment._id,
       parameter: 'water',
       value: 500
     });
 
-    await request(app)
+    const response = await request(app)
       .delete(`/api/readings/${reading._id}`)
       .expect(401);
+
+    expect(response.text).toMatch(/token/i); // generic token error
   });
 });

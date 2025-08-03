@@ -31,6 +31,15 @@ dataController.create = async (req, res, next) => {
   try {
     res.locals.data.equipment = await Equipment.create(req.body);
     res.locals.data.token = req.query.token || res.locals.data.token;
+
+    // --- MQTT Publish ---
+    try {
+      const { publishEquipment } = require('../../utility/mqttClient');
+      publishEquipment(res.locals.data.equipment, 'created');
+    } catch (err) {
+      console.warn('MQTT publish failed:', err.message);
+    }
+
     next();
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -43,6 +52,15 @@ dataController.update = async (req, res, next) => {
     const updated = await Equipment.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.locals.data.equipment = updated;
     res.locals.data.token = req.query.token || res.locals.data.token;
+
+    // --- MQTT Publish ---
+    try {
+      const { publishEquipment } = require('../../utility/mqttClient');
+      publishEquipment(updated, 'updated');
+    } catch (err) {
+      console.warn('MQTT publish failed:', err.message);
+    }
+
     next();
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -52,8 +70,17 @@ dataController.update = async (req, res, next) => {
 // DESTROY: Delete equipment
 dataController.destroy = async (req, res, next) => {
   try {
-    await Equipment.findByIdAndDelete(req.params.id);
+    const deleted = await Equipment.findByIdAndDelete(req.params.id);
     res.locals.data.token = req.query.token || res.locals.data.token;
+
+    // --- MQTT Publish ---
+    try {
+      const { publishEquipment } = require('../../utility/mqttClient');
+      publishEquipment(deleted, 'deleted');
+    } catch (err) {
+      console.warn('MQTT publish failed:', err.message);
+    }
+
     next();
   } catch (error) {
     res.status(400).json({ message: error.message });

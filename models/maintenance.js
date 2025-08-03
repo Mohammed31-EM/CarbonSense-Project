@@ -26,4 +26,5 @@ const maintenanceSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('MaintenanceLog', maintenanceSchema);
+// 👇 Export as 'Maintenance'
+module.exports = mongoose.model('Maintenance', maintenanceSchema);
