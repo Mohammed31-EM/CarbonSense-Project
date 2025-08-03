@@ -6,8 +6,10 @@ const viewController = {
     res.render('report/Index', { 
       ...res.locals.data,
       token: res.locals.data.token || req.query.token || ''
+
     });
   },
+
 
   // SHOW: Show single report
   show(req, res) {
@@ -31,6 +33,8 @@ const viewController = {
       const plants = await Plant.find().lean();
       const token = res.locals.data?.token || req.query.token || '';
       res.render('report/New', { plants, token });
+      console.log('PLANTS:', plants);
+
     } catch (err) {
       res.status(500).send('Error loading plants: ' + err.message);
     }
