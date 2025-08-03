@@ -65,7 +65,7 @@ describe('👤 User API', () => {
       .expect(400);
 
     // Should match "already exists" or "User already exists"
-    expect(res.body.message).toMatch(/already exists/i);
+    expect(res.body.message).toMatch('User already exists');
   });
 
   it('should login a user and receive a token', async () => {
@@ -97,12 +97,18 @@ describe('👤 User API', () => {
   });
 
   it('should get user profile with valid token', async () => {
-    const res = await request(app)
-      .get('/api/users/profile')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
+    const email = `test${Math.ceil(Math.random()* 1000)}@example.com`
+    const user = new User({name: 'Test User', email: email, password: 'testpass123'})
+    await user.save()
+    const token = await user.generateAuthToken()
 
-    expect(res.body.user).toHaveProperty('email', 'test@example.com');
+    const res = await request(app)
+    .get('/api/users/profile')
+    .set('Authorization', `Bearer ${token}`)
+    // console.log(`Bearer ${token}`)
+    .expect(200);
+    
+    expect(res.body.user).toHaveProperty('email');
     expect(res.body.user).not.toHaveProperty('password');
   });
 

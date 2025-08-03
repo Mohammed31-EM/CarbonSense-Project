@@ -1,5 +1,5 @@
 const Reading = require('../../models/reading');
-
+const {publishReading, publishPlant, publishEquipment } = require('../../utility/mqttClient')
 const dataController = {};
 
 /**

@@ -1,12 +1,14 @@
+require('dotenv').config()
 const User = require('../../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 // API Authentication middleware - uses headers instead of query params
 exports.auth = async (req, res, next) => {
+  
   try {
-    const token = req.header('Authorization').replace('Bearer ', '')
-    const data = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret')
+    const token = req.header('Authorization').replace(`Bearer `,'')
+    const data = jwt.verify(token, 'secret')
     const user = await User.findOne({ _id: data._id })
     if (!user) {
       throw new Error()
@@ -31,7 +33,7 @@ exports.createUser = async (req, res) => {
     const token = await user.generateAuthToken()
     res.status(201).json({ user, token })
   } catch (error) {
-    res.status(400).json({ message: error.message })
+    res.status(400).json({message: 'User already exists'})
   }
 }
 
@@ -78,8 +80,7 @@ exports.deleteUser = async (req, res) => {
 // API Get user profile
 exports.getProfile = async (req, res) => {
   try {
-    await req.user.populate('engineers')
-    res.json({ user: req.user })
+    res.json({ user: req.user})
   } catch (error) {
     res.status(400).json({ message: error.message })
   }

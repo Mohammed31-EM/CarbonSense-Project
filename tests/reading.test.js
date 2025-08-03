@@ -14,10 +14,7 @@ let token, user, plant, equipment;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  await mongoose.connect(mongoServer.getUri());
 });
 
 afterAll(async () => {
@@ -32,20 +29,32 @@ beforeEach(async () => {
   await Equipment.deleteMany({});
   await Reading.deleteMany({});
 
-  // Create a test user and log in
-  user = await User.create({
-    name: 'Test User',
-    email: 'testuser@example.com',
-    password: 'password123'
-  });
-  token = await User.login('testuser@example.com', 'password123');
-  token = `Bearer ${token}`;
+  // Register user via API
+  await request(app)
+    .post('/api/users')
+    .send({
+      name: 'Test User',
+      email: 'testuser@example.com',
+      password: 'password123'
+    });
 
-  // Create plant and equipment
+  // Login user via API
+  const loginRes = await request(app)
+    .post('/api/users/login')
+    .send({
+      email: 'testuser@example.com',
+      password: 'password123'
+    });
+
+  token = `Bearer ${loginRes.body.token}`;
+  user = loginRes.body.user;
+
+  // Create plant and equipment with user ownership
   plant = await Plant.create({
     name: 'Test Plant',
     location: 'Bahrain',
-    emissions: 100
+    emissions: 100,
+    user: user._id // assign ownership
   });
 
   equipment = await Equipment.create({
@@ -83,7 +92,7 @@ describe('📊 Reading API Tests', () => {
       })
       .expect(401);
 
-    expect(response.text).toMatch(/token/i); // generic token error
+    expect(response.text).toMatch(/token/i);
   });
 
   test('✅ should return all readings for authenticated user', async () => {
@@ -173,6 +182,6 @@ describe('📊 Reading API Tests', () => {
       .delete(`/api/readings/${reading._id}`)
       .expect(401);
 
-    expect(response.text).toMatch(/token/i); // generic token error
+    expect(response.text).toMatch(/token/i);
   });
 });

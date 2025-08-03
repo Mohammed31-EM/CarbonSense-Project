@@ -1,7 +1,8 @@
+require('dotenv').config()
 const mqtt = require('mqtt');
 
 // Use environment variables for credentials for security
-const MQTT_BROKER = process.env.MQTT_BROKER || 'YOUR-CLUSTER.s2.eu.hivemq.cloud';
+const MQTT_BROKER = process.env.MQTT_BROKER || '5017366e502b4a20a0d696a96d97570b.s1.eu.hivemq.cloud';
 const MQTT_PORT = process.env.MQTT_PORT || 8883;
 const MQTT_USERNAME = process.env.MQTT_USERNAME || 'your-hivemq-username';
 const MQTT_PASSWORD = process.env.MQTT_PASSWORD || 'your-hivemq-password';
