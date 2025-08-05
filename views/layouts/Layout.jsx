@@ -1,6 +1,6 @@
 const React = require('react');
 
-function Layout({ title, children, token }) {
+function Layout({ title, children, token, showScript }) {
   const hasToken = !!token;
   const safeToken = token || '';
 
@@ -15,6 +15,10 @@ function Layout({ title, children, token }) {
         <title>{title || 'CarbonSense Dashboard'}</title>
         <link rel="stylesheet" href="/css/style.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+        {showScript? <script defer={true} src='/scripts/script.js'></script>: null}
+        {hasToken && (
+          <script dangerouslySetInnerHTML={{__html: `window.TOKEN = "${encodeURIComponent(safeToken)}";`}} />
+        )}
       </head>
       <body>
         {/* Navigation Bar */}
@@ -24,6 +28,7 @@ function Layout({ title, children, token }) {
             <ul className="nav-links">
                 <li><a href={buildLink('/plants')}>Plants</a></li>
                 <li><a href={buildLink('/equipment')}>Equipment</a></li>
+                <li><a href={buildLink('/maintenance')}>Maintenance</a></li>
                 <li><a href={buildLink('/reports')}>Reports</a></li>
                 <li><a href={buildLink('/users/login')}>Login</a></li>
                 <li><a href={buildLink('/users/signup')}>Sign Up</a></li>
@@ -39,6 +44,7 @@ function Layout({ title, children, token }) {
         <footer className="footer">
           <p>© {new Date().getFullYear()} CarbonSense | Real-Time Industrial Sustainability Monitoring</p>
         </footer>
+
       </body>
     </html>
   );

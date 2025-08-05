@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 const maintenanceSchema = new mongoose.Schema({
+  title: {type: String, required: true},
+  description: {type: String, required: true },
   equipmentId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Equipment', 
@@ -21,7 +23,7 @@ const maintenanceSchema = new mongoose.Schema({
   nextScheduledDate: { type: Date },
   status: { 
     type: String, 
-    enum: ['Pending', 'In Progress', 'Completed'], 
+    enum: ['Pending', 'In Progress', 'Completed', 'Scheduled'], 
     default: 'Pending' 
   }
 }, { timestamps: true });

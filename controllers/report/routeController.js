@@ -4,16 +4,25 @@ const router = express.Router();
 const dataController = require('./dataController');
 const apiController = require('./apiController');
 const viewController = require('./viewController'); 
-const { auth } = require('../auth/dataController');
+const authDataController = require('../auth/dataController');
 
 // --- Web Views ---
-router.get('/new', auth, viewController.newView); 
+router.get('/new', authDataController.auth, viewController.newView); 
+router.get('/:id/edit', authDataController.auth, dataController.show, viewController.edit);
+router.get('/', authDataController.auth, dataController.index, viewController.index);
+router.get('/:id', authDataController.auth, dataController.show, viewController.show);
+router.post('/', authDataController.auth, dataController.create, viewController.redirectHome)
+router.put('/:id', authDataController.auth, dataController.update, viewController.redirectShow)
+router.delete('/:id', authDataController.auth, dataController.destroy, viewController.redirectHome)
 
 // --- API Endpoints ---
-router.get('/', auth, dataController.index, apiController.index);
-router.get('/:id', auth, dataController.show, apiController.show);
-router.post('/', auth, dataController.create, apiController.show);
-router.put('/:id', auth, dataController.update, apiController.show);
-router.delete('/:id', auth, dataController.destroy, apiController.destroy);
+router.get('/api', authDataController.auth, dataController.index, apiController.index);
+router.get('/api/:id', authDataController.auth, dataController.show, apiController.show);
+router.post('/api', authDataController.auth, dataController.create, apiController.create);
+router.put('/api/:id', authDataController.auth, dataController.update, apiController.update);
+router.delete('/api/:id', authDataController.auth, dataController.destroy, apiController.destroy);
+
+// --- Custom Endpoint for report generation via AJAX ---
+
 
 module.exports = router;

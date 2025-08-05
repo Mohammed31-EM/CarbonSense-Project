@@ -22,17 +22,17 @@ const client = mqtt.connect(brokerUrl, options);
 client.on('connect', () => {
   console.log('🟢 Connected to HiveMQ Cloud!');
   // Subscribe to a topic for new readings
-  client.subscribe('carbonsense/readings/new', (err) => {
+  client.subscribe('plant1/temperature', (err) => {
     if (err) {
       console.error('❌ Failed to subscribe to readings topic:', err.message);
     } else {
-      console.log('✅ Subscribed to topic: carbonsense/readings/new');
+      console.log('✅ Subscribed to topic: plant1/temperature');
     }
   });
 });
 
 client.on('message', (topic, message) => {
-  if (topic === 'carbonsense/readings/new') {
+  if (topic === 'plant1/temperature') {
     // Handle new reading message (JSON)
     try {
       const reading = JSON.parse(message.toString());
@@ -57,7 +57,7 @@ function publishReading(reading) {
     console.warn('MQTT client not connected, cannot publish reading');
     return;
   }
-  client.publish('carbonsense/readings/new', JSON.stringify(reading), { qos: 1 }, (err) => {
+  client.publish('plant1/temperature', JSON.stringify(reading), { qos: 1 }, (err) => {
     if (err) {
       console.error('❌ Failed to publish reading:', err.message);
     } else {

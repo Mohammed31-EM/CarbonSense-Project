@@ -13,7 +13,7 @@ function Edit({ maintenance, token }) {
         <textarea name="description" defaultValue={maintenance.description} required></textarea><br/>
 
         <label>Date:</label>
-        <input type="date" name="date" defaultValue={maintenance.date.split('T')[0]} required /><br/>
+        <input type="date" name="date" defaultValue={maintenance.date? new Date(maintenance.date).toISOString().split('T')[0]: ''} required /><br/>
 
         <label>Status:</label>
         <select name="status" defaultValue={maintenance.status}>

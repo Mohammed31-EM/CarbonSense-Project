@@ -1,15 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-// ✅ Controllers
+// Controllers
 const authDataController = require('../auth/apiController');
 const dataController = require('./dataController');
 const apiController = require('./apiController');
 const viewController = require('./viewController');
 
-// ===========================
-// 🌍 VIEW ROUTES (Web Pages)
-// ===========================
+
 
 // Index - List all readings
 router.get('/', authDataController.auth, dataController.index, viewController.index);
@@ -23,9 +21,6 @@ router.get('/:id', authDataController.auth, dataController.show, viewController.
 // Edit - Show form to edit a reading
 router.get('/:id/edit', authDataController.auth, dataController.show, viewController.edit);
 
-// ===========================
-// 🌍 API ROUTES (JSON Responses)
-// ===========================
 
 // Get all readings
 router.get('/api', authDataController.auth, apiController.index);

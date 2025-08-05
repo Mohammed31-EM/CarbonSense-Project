@@ -5,9 +5,7 @@ const authDataController = require('../auth/dataController');
 const dataController = require('./dataController');
 const viewController = require('./viewController');
 
-// ===========================
-// WEB ROUTES
-// ===========================
+
 router.get('/', authDataController.auth, dataController.index, viewController.index);
 router.get('/new', authDataController.auth, viewController.newView);
 router.post('/', authDataController.auth, dataController.create, viewController.redirectHome);

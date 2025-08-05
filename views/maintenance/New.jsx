@@ -1,7 +1,7 @@
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function New({ token }) {
+function New({plants = [], equipment =[], token }) {
   return (
     <Layout title="Add Maintenance Record">
       <h1>Add Maintenance Record</h1>
@@ -20,6 +20,22 @@ function New({ token }) {
           <option value="Scheduled">Scheduled</option>
           <option value="In Progress">In Progress</option>
           <option value="Completed">Completed</option>
+        </select><br/>
+
+        <label>Plant:</label>
+        <select name = "plantId" required>
+          <option value = "">--Select Plant--</option>
+          {plants.map(plant => (
+            <option key={plant._id} value={plant._id}>{plant.name}</option>
+          ))}
+        </select><br/>
+
+        <label>Equipment:</label>
+        <select name = "equipmentId" required>
+          <option value = "">--Select Equipment--</option>
+          {equipment.map(eq => (
+            <option key={eq._id} value={eq._id}>{eq.name}</option>
+          ))}
         </select><br/>
 
         <input type="submit" value="Add Record" />

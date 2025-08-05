@@ -37,6 +37,7 @@ app.use('/maintenance', maintenanceRoutes); // Manage maintenance logs
 app.use('/reading', readingRoutes);      // Manage equipment readings
 app.use('/reports', reportRoutes);       // Sustainability reports
 
+
 // ---------- API Routes (JSON responses) ----------
 app.use('/api', apiRoutes);
 

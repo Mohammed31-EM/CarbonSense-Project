@@ -1,19 +1,25 @@
-exports.index = (req, res) => {
+
+const apiController = {}
+
+apiController.index = (req, res) => {
+
   res.json(res.locals.data.maintenance);
 };
 
-exports.show = (req, res) => {
+apiController.show = (req, res) => {
   res.json(res.locals.data.maintenance);
 };
 
-exports.create = (req, res) => {
+apiController.create = (req, res) => {
   res.status(201).json(res.locals.data.maintenance);
 };
 
-exports.update = (req, res) => {
+apiController.update = (req, res) => {
   res.status(200).json(res.locals.data.maintenance);
 };
 
-exports.destroy = (req, res) => {
+apiController.destroy = (req, res) => {
   res.status(200).json({ message: res.locals.data.message });
 };
+
+module.exports = apiController;

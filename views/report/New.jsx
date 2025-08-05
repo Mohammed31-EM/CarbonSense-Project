@@ -2,31 +2,34 @@ const React = require('react');
 const Layout = require('../layouts/Layout');
 
 function New({ plants = [], token }) {
-  const [result, setResult] = React.useState(null);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const plantId = form.plantId.value;
-    const periodStart = form.periodStart.value;
-    const periodEnd = form.periodEnd.value;
-    setResult('Generating...');
-    try {
-      const response = await fetch('/api/reports/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plantId, periodStart, periodEnd })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setResult(data);
-      } else {
-        setResult(data.error || 'Error generating report');
-      }
-    } catch (err) {
-      setResult('Error: ' + err.message);
-    }
-  };
+  // const [result, setResult] = React.useState(null);
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const form = e.target;
+  //   const plantId = form.plantId.value;
+  //   const periodStart = form.periodStart.value;
+  //   const periodEnd = form.periodEnd.value;
+  //   setResult('Generating...');
+  //   try {
+  //     const response = await fetch('/reports', {
+  //       method: 'POST',
+  //       headers: { 
+  //         'Content-Type': 'application/json',
+  //         'Authorization' : `Bearer ${token}`
+        
+  //       },
+  //       body: JSON.stringify({ plantId, periodStart, periodEnd })
+  //     });
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       setResult(data);
+  //     } else {
+  //       setResult(data.error || 'Error generating report');
+  //     }
+  //   } catch (err) {
+  //     setResult('Error: ' + err.message);
+  //   }
+  // };
 
   // 🚨 Show message if no plants exist
   if (!plants.length) {
@@ -42,10 +45,10 @@ function New({ plants = [], token }) {
   }
 
   return (
-    <Layout title="Generate New Report" token={token}>
+    <Layout title="Generate New Report" token={token} showScript={true}>
       <div className="container">
         <h1>➕ Generate Sustainability Report</h1>
-        <form onSubmit={handleSubmit}>
+        <form>
           <label>Plant:</label>
           <select name="plantId" required>
             {plants.map((plant) => (
@@ -59,7 +62,7 @@ function New({ plants = [], token }) {
           <button type="submit" className="btn">Generate Report</button>
         </form>
         <a href={`/reports?token=${token}`} className="btn">Cancel</a>
-        {result && (
+        {/* {result && (
           <div className="report-result" style={{ marginTop: '2em' }}>
             {typeof result === 'string' ? (
               <p>{result}</p>
@@ -79,7 +82,7 @@ function New({ plants = [], token }) {
               </div>
             )}
           </div>
-        )}
+        )} */}
       </div>
     </Layout>
   );

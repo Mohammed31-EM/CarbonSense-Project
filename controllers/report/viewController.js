@@ -4,26 +4,24 @@ const viewController = {
   // INDEX: List all reports
   index(req, res) {
     res.render('report/Index', { 
-      ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
-
+      reports: res.locals.data,
+      token: req.query.token || ''
     });
   },
-
 
   // SHOW: Show single report
   show(req, res) {
     res.render('report/Show', { 
-      ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
+      reports: res.locals.data,
+      token: req.query.token || ''
     });
   },
 
   // EDIT: Show edit report form
   edit(req, res) {
     res.render('report/Edit', { 
-      ...res.locals.data,
-      token: res.locals.data.token || req.query.token || ''
+      reports: res.locals.data,
+      token: req.query.token || ''
     });
   },
 
@@ -31,10 +29,8 @@ const viewController = {
   async newView(req, res) {
     try {
       const plants = await Plant.find().lean();
-      const token = res.locals.data?.token || req.query.token || '';
+      const token = req.query.token || '';
       res.render('report/New', { plants, token });
-      console.log('PLANTS:', plants);
-
     } catch (err) {
       res.status(500).send('Error loading plants: ' + err.message);
     }
@@ -42,9 +38,9 @@ const viewController = {
 
   // Redirect to main reports page
   redirectHome(req, res) {
-    const token = req.query.token || res.locals.data.token || '';
+    const token = req.query.token || '';
     if (token) {
-      res.redirect(`/reports?token=${encodeURIComponent(token)}`);
+      res.redirect(`/reports?token=${token}`);
     } else {
       res.redirect('/reports');
     }
@@ -52,7 +48,7 @@ const viewController = {
 
   // Redirect to a specific report details page
   redirectShow(req, res) {
-    const token = req.query.token || res.locals.data.token || '';
+    const token = req.query.token || '';
     if (token) {
       res.redirect(`/reports/${req.params.id}?token=${encodeURIComponent(token)}`);
     } else {

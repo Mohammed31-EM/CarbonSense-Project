@@ -143,4 +143,26 @@ dataController.destroy = async (req, res, next) => {
   }
 };
 
+dataController.generateReport = async (req, res,) => {
+  console.log('request', req.body)
+  try {
+    const {plantId, periodStart, periodEnd } = req.body;
+    let metrics = {};
+    try {
+      metrics = await reportGenerator(plantId, periodStart, periodEnd);
+    } catch (err) {
+      metrics = {
+        totalEmissions: 0,
+        totalEnergy: 0,
+        waterUsage: 0,
+        waste: 0,
+        carbonFootprint: 0
+      };
+    }
+    res.json(metrics);
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+}
+
 module.exports = dataController;

@@ -6,23 +6,26 @@ const JWT_SECRET = 'secret'; // For testing ONLY—replace in production!
 
 // Helper to get bare JWT token from header or query
 function extractBearerToken(authHeaderOrToken) {
+  console.log('auth header token', authHeaderOrToken)
   if (!authHeaderOrToken) return null;
   return authHeaderOrToken.startsWith('Bearer ') ? authHeaderOrToken.slice(7) : authHeaderOrToken;
 }
 
 // Middleware: Authenticate via JWT
 exports.auth = async (req, res, next) => {
+  console.log('request', req.body)
   try {
     let token =
       extractBearerToken(req.header('Authorization')) ||
       extractBearerToken(req.query.token);
+      console.log('token', token)
 
-    if (!token) return res.status(401).send('Token missing');
+    if (!token) return res.status(401).json({error: 'Token missing'});
 
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded._id);
 
-    if (!user) return res.status(401).send('User not found');
+    if (!user) return res.status(401).json({error: 'User not found'});
 
     req.user = user;
     res.locals.data = { token, user };

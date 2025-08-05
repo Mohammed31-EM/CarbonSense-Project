@@ -2,9 +2,6 @@ const Reading = require('../../models/reading');
 
 const apiController = {};
 
-/**
- * ✅ INDEX: Get all readings
- */
 apiController.index = async (req, res) => {
   try {
     const readings = await Reading.find()
@@ -15,9 +12,6 @@ apiController.index = async (req, res) => {
   }
 };
 
-/**
- * ✅ SHOW: Get a single reading by ID
- */
 apiController.show = async (req, res) => {
   try {
     const reading = await Reading.findById(req.params.id)
@@ -29,9 +23,7 @@ apiController.show = async (req, res) => {
   }
 };
 
-/**
- * ✅ CREATE: Add a new reading
- */
+
 apiController.create = async (req, res) => {
   try {
     if (!req.body.equipmentId || !req.body.parameter || req.body.value === undefined) {
@@ -44,9 +36,6 @@ apiController.create = async (req, res) => {
   }
 };
 
-/**
- * ✅ UPDATE: Edit an existing reading
- */
 apiController.update = async (req, res) => {
   try {
     const updatedReading = await Reading.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -57,9 +46,7 @@ apiController.update = async (req, res) => {
   }
 };
 
-/**
- * ✅ DELETE: Remove a reading by ID
- */
+
 apiController.destroy = async (req, res) => {
   try {
     const deletedReading = await Reading.findByIdAndDelete(req.params.id);

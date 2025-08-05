@@ -18,6 +18,8 @@ const readingApiController = require('../controllers/reading/apiController');
 
 const reportDataController = require('../controllers/report/dataController');
 const reportApiController = require('../controllers/report/apiController');
+const reportGenerator = require('../utility/reportGenerator');
+const authDataController = require('../controllers/auth/dataController')
 
 router.post('/users', userApiController.createUser);
 router.post('/users/login', userApiController.loginUser);
@@ -56,8 +58,8 @@ router.put('/reports/:id', userDataController.auth, reportDataController.update,
 router.delete('/reports/:id', userDataController.auth, reportDataController.destroy, reportApiController.destroy);
 
 // --- REPORT GENERATION ENDPOINT ---
-const reportGenerator = require('../utility/reportGenerator');
-router.post('/api/reports/generate', async (req, res) => {
+
+router.post('/reports/generate',authDataController.auth, async (req, res) => {
   try {
     const { plantId, periodStart, periodEnd } = req.body;
     const report = await reportGenerator(plantId, periodStart, periodEnd);
@@ -66,5 +68,9 @@ router.post('/api/reports/generate', async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+router.use((req, res) => {
+  res.status(404).json({ error: 'Api endpoint not found'})
+})
 
 module.exports = router;
