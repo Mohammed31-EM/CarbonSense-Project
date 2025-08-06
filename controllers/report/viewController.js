@@ -1,5 +1,7 @@
 const Plant = require('../../models/plant');
 
+const RESOURCE_PATH = ('/report')
+
 const viewController = { 
   // INDEX: List all reports
   index(req, res) {
@@ -38,11 +40,14 @@ const viewController = {
 
   // Redirect to main reports page
   redirectHome(req, res) {
-    const token = req.query.token || '';
+     token =
+      req.query.token ||
+      (res.locals.data && res.locals.data.token) ||
+      '';
     if (token) {
-      res.redirect(`/reports?token=${token}`);
+      res.redirect(`${RESOURCE_PATH}?token=${encodeURIComponent(token)}`);
     } else {
-      res.redirect('/reports');
+      res.redirect(`${RESOURCE_PATH}`);
     }
   },
 

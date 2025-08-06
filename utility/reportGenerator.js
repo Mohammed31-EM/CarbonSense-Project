@@ -3,6 +3,7 @@ const Reading = require('../models/reading');
 const Equipment = require('../models/equipment');
 const fs = require('fs');
 const path = require('path');
+const PDFDocument = require('pdfkit');
 
 /**
  * Generate sustainability metrics for a plant within a given period.
@@ -22,6 +23,7 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
   if (isNaN(startDate) || isNaN(endDate)) throw new Error('Invalid date range');
   endDate.setHours(23,59,59,999)
   
+ 
 
   // Fetch equipment IDs for this plant
   const equipment = await Equipment.find({ plantId }).select('_id');
@@ -31,8 +33,9 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
   const readings = await Reading.find({
     equipmentId: { $in: equipmentIds },
     timestamp: { $gte: startDate, $lte: endDate }
-  });
 
+  });
+console.log('error checkinggggg: ', equipmentIds)
 
   // Aggregate readings
   const metrics = {
@@ -64,6 +67,29 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
     Carbon Footprint: ${metrics.carbonFootprint} CO₂-e
   `;
   
+  const pdfFilePath = path.join(reportsDir, `report_${plantId}_${Date.now()}.pdf`)
+  const doc = new PDFDocument();
+
+  const pdfStream = fs.createWriteStream(pdfFilePath);
+  doc.pipe(pdfStream);
+
+doc.fontSize(18).text(`Sustainability Report - ${plant.name}`, { underline: true });
+doc.moveDown();
+doc.fontSize(12).text(`Period: ${startDate.toDateString()} to ${endDate.toDateString()}`);
+doc.text(`Location: ${plant.location}`);
+doc.moveDown();
+doc.text(`Total Emissions: ${metrics.totalEmissions} tons CO₂`);
+doc.text(`Total Energy: ${metrics.totalEnergy} kWh`);
+doc.text(`Water Usage: ${metrics.waterUsage} L`);
+doc.text(`Waste Generated: ${metrics.waste} kg`);
+doc.text(`Carbon Footprint: ${metrics.carbonFootprint} CO₂-e`);
+
+doc.end();
+
+await new Promise((resolve, reject) => {
+  pdfStream.on('finish', resolve);
+  pdfStream.on('error', reject);
+});
 
   const filePath = path.join(reportsDir, `report_${plantId}_${Date.now()}.txt`);
   try {
@@ -72,41 +98,9 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
     throw new Error('Failed to write report file: ' + err.message);
   }
   const filename = path.basename(filePath)
-  return { ...metrics, filename};
+  return { ...metrics,txtFilename: filename, pdfFilename: path.basename(pdfFilePath)};
 }
 
 module.exports = reportGenerator;
 
-// --- SAMPLE EXPRESS ROUTE FOR REPORT GENERATION ---
-// Add this to your routes/apiRoutes.js or similar file:
-/*
-const express = require('express');
-const router = express.Router();
-const reportGenerator = require('../utility/reportGenerator');
 
-// POST /api/reports/generate
-router.post('/api/reports/generate', async (req, res) => {
-  try {
-    const { plantId, periodStart, periodEnd } = req.body;
-    const report = await reportGenerator(plantId, periodStart, periodEnd);
-    res.json(report);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-module.exports = router;
-*/
-
-// --- SAMPLE FRONTEND FETCH FUNCTION ---
-// Use this in your React/JSX view to call the backend route:
-/*
-async function generateReport(plantId, periodStart, periodEnd) {
-  const response = await fetch('/api/reports/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plantId, periodStart, periodEnd })
-  });
-  const data = await response.json();
-  // Handle data (show metrics, link to file, etc.)
-}
-*/

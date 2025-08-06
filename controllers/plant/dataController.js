@@ -6,6 +6,8 @@ const dataController = {};
 dataController.index = async (req, res, next) => {
   try {
     res.locals.data.plants = await Plant.find({ user: req.user._id });
+    res.locals.data.token = req.query.token || res.locals.data.token;
+
     next();
   } catch (error) {
     res.status(400).json({ message: error.message });

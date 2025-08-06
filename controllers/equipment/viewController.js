@@ -1,3 +1,6 @@
+const Plant = require('../../models/plant');
+const Equipment = require('../../models/equipment')
+
 const RESOURCE_PATH = '/equipment';
 
 const viewController = {
@@ -13,11 +16,19 @@ const viewController = {
       token: req.query.token || res.locals.data.token || ''
     });
   },
-  edit(req, res) {
-    res.render('equipment/Edit', {
-      equipment: res.locals.data.equipment,
-      token: req.query.token || res.locals.data.token || ''
-    });
+  async edit(req, res) {
+    try {
+      const equipment = res.locals.data.equipment;
+      const plants = await Plant.find().lean();
+      res.render('equipment/Edit', {
+        equipment,
+        plants,
+        token: req.query.token || res.locals.data.token || ''
+      });
+    } catch (err) {
+      res.status(500).send('Error loading form data:' + err.message)
+    }
+    
   },
   async newView(req, res) {
     const Plant = require('../../models/plant');
@@ -28,16 +39,23 @@ const viewController = {
     });
   },
   redirectHome(req, res) {
-    const token = req.query.token || res.locals.data.token || '';
+    const token =
+      req.query.token ||
+      (res.locals.data && res.locals.data.token) ||
+      '';
     if (token) {
-      res.redirect(`/plants?token=${encodeURIComponent(token)}`);
+      res.redirect(`${RESOURCE_PATH}?token=${encodeURIComponent(token)}`);
     } else {
-      res.redirect('/plants');
+      res.redirect(RESOURCE_PATH);
     }
   },
   redirectShow(req, res) {
-    if (res.locals.data.token) {
-      res.redirect(`${RESOURCE_PATH}/${req.params.id}?token=${res.locals.data.token}`);
+    const token =
+      req.query.token ||
+      (res.locals.data && res.locals.data.token) ||
+      '';
+    if (token) {
+      res.redirect(`${RESOURCE_PATH}/${req.params.id}?token=${token}`);
     } else {
       res.redirect(`${RESOURCE_PATH}/${req.params.id}`);
     }

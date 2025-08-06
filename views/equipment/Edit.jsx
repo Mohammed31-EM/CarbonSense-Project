@@ -1,7 +1,7 @@
 const React = require('react');
 const Layout = require('../layouts/Layout');
 
-function Edit({ equipment, token }) {
+function Edit({ equipment, plants =[], token }) {
   return (
     <Layout title="Edit Equipment">
       <div className="container">
@@ -19,8 +19,17 @@ function Edit({ equipment, token }) {
             <option value="Inactive">Inactive</option>
           </select><br />
 
-          <label>Linked Plant ID:</label>
-          <input type="text" name="plant" defaultValue={equipment.plant} required /><br />
+          <label>Linked Plant:</label>
+          <select name="plantId" defaultValue={equipment.plantId ? equipment.plantId.toString() : ''} required>
+            <option value="">Select Plant</option>
+            {plants.map((plant) => (
+              <option key={plant._id} value={plant._id}
+                selected={equipment.plantId && plant._id.toString() === equipment.plantId.toString()}>
+                {plant.name}
+              </option>
+            ))}
+          </select>
+            <br />
 
           <button type="submit">Update Equipment</button>
         </form>

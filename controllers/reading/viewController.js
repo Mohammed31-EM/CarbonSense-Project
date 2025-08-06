@@ -1,7 +1,5 @@
 const viewController = { 
-  /**
-   * ✅ INDEX: List all readings
-   */
+
   index(req, res) {
     res.render('reading/Index', { 
       ...res.locals.data,

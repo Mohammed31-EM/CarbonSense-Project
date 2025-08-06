@@ -30,8 +30,17 @@ function Layout({ title, children, token, showScript }) {
                 <li><a href={buildLink('/equipment')}>Equipment</a></li>
                 <li><a href={buildLink('/maintenance')}>Maintenance</a></li>
                 <li><a href={buildLink('/reports')}>Reports</a></li>
-                <li><a href={buildLink('/users/login')}>Login</a></li>
-                <li><a href={buildLink('/users/signup')}>Sign Up</a></li>
+
+                {!token && (
+                  <>
+                    <li><a href={buildLink('/users/login')}>Login</a></li>
+                    <li><a href={buildLink('/users/signup')}>Sign Up</a></li>
+                  </>
+                )}
+                {token && (
+                  <li><a href={buildLink('/users/login')}>Logout</a></li>
+                )}
+                
             </ul>
 
           </div>

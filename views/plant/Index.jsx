@@ -37,7 +37,7 @@ function Index(props) {
                       method="POST" 
                       style={{ display: 'inline' }}
                     >
-                      <button type="submit" className="btn danger">Delete</button>
+                      <button type="submit" className="btn danger" padding="1px">Delete</button>
                     </form>
                   </td>
                 </tr>

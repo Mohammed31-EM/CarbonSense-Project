@@ -3,7 +3,7 @@ const Layout = require('../layouts/Layout');
 
 function Index({ equipments, token }) {
   return (
-    <Layout title="All Equipment">
+    <Layout title="All Equipment" token={token}>
       <div className="container">
         <h1>Equipment List</h1>
         <a href={`/equipment/new?token=${token}`}><button>Add New Equipment</button></a>

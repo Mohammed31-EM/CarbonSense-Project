@@ -1,9 +1,7 @@
 const RESOURCE_PATH = '/plants';
 
 const viewController = {
-  // ✅ Render index view
   index(req, res, next) {
-    // Try to get token from query or from res.locals.data (set by auth)
     const token =
       req.query.token ||
       (res.locals.data && res.locals.data.token) ||

@@ -53,6 +53,7 @@ const viewController = {
     } else {
       res.redirect(RESOURCE_PATH);
     }
+   
   },
 
   redirectShow(req, res) {
