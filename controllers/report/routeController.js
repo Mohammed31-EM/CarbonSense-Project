@@ -18,10 +18,9 @@ router.get('/download', (req, res) => {
 
   res.download(filePath, file, err => {
     if (err) res.status(500).send('Error downloading file.');
-  });
+  });
 });
 
-// --- Web Views ---
 router.get('/new', authDataController.auth, viewController.newView); 
 router.get('/:id/edit', authDataController.auth, dataController.show, viewController.edit);
 router.get('/', authDataController.auth, dataController.index, viewController.index);
@@ -30,13 +29,11 @@ router.post('/', authDataController.auth, dataController.create, viewController.
 router.put('/:id', authDataController.auth, dataController.update, viewController.redirectShow)
 router.delete('/:id', authDataController.auth, dataController.destroy, viewController.redirectHome)
 
-// --- API Endpoints ---
 router.get('/api', authDataController.auth, dataController.index, apiController.index);
 router.get('/api/:id', authDataController.auth, dataController.show, apiController.show);
 router.post('/api', authDataController.auth, dataController.create, apiController.create);
 router.put('/api/:id', authDataController.auth, dataController.update, apiController.update);
 router.delete('/api/:id', authDataController.auth, dataController.destroy, apiController.destroy);
 
-// --- Custom Endpoint for report generation via AJAX ---
 
 module.exports = router;

@@ -7,8 +7,8 @@ const equipmentSchema = new mongoose.Schema({
     required: true 
   },
   name: { type: String, required: true },
-  type: { type: String, required: true }, // e.g., Pump, Generator
-  energyRating: { type: Number }, // kWh
+  type: { type: String, required: true }, 
+  energyRating: { type: Number }, 
   status: { 
     type: String, 
     enum: ['Operational', 'Idle', 'Faulty'], 

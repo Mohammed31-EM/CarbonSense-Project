@@ -2,7 +2,6 @@ const Equipment = require('../../models/equipment');
 
 const dataController = {};
 
-// INDEX: Get all equipment
 dataController.index = async (req, res, next) => {
   try {
     res.locals.data.equipments = await Equipment.find();
@@ -13,7 +12,6 @@ dataController.index = async (req, res, next) => {
   }
 };
 
-// SHOW: Get one equipment by ID
 dataController.show = async (req, res, next) => {
   try {
     const equipment = await Equipment.findById(req.params.id);
@@ -26,7 +24,7 @@ dataController.show = async (req, res, next) => {
   }
 };
 
-// CREATE: Add new equipment
+
 dataController.create = async (req, res, next) => {
   try {
     res.locals.data.equipment = await Equipment.create(req.body);
@@ -46,7 +44,7 @@ dataController.create = async (req, res, next) => {
   }
 };
 
-// UPDATE: Edit equipment
+
 dataController.update = async (req, res, next) => {
   try {
     const updated = await Equipment.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -67,7 +65,7 @@ dataController.update = async (req, res, next) => {
   }
 };
 
-// DESTROY: Delete equipment
+
 dataController.destroy = async (req, res, next) => {
   try {
     const deleted = await Equipment.findByIdAndDelete(req.params.id);

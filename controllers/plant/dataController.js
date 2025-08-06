@@ -2,7 +2,6 @@ const Plant = require('../../models/plant.js');
 
 const dataController = {};
 
-// INDEX: List only this user's plants
 dataController.index = async (req, res, next) => {
   try {
     res.locals.data.plants = await Plant.find({ user: req.user._id });
@@ -14,7 +13,6 @@ dataController.index = async (req, res, next) => {
   }
 };
 
-// DESTROY: Only let user delete their own plant
 dataController.destroy = async (req, res, next) => {
   try {
     const deleted = await Plant.findOneAndDelete({
@@ -30,7 +28,6 @@ dataController.destroy = async (req, res, next) => {
   }
 };
 
-// UPDATE: Only let user update their own plant
 dataController.update = async (req, res, next) => {
   try {
     const { name, location, emissions, status } = req.body;
@@ -48,7 +45,6 @@ dataController.update = async (req, res, next) => {
   }
 };
 
-// CREATE: Attach user to every plant
 dataController.create = async (req, res, next) => {
   try {
     const { name, location, emissions, status } = req.body;
@@ -65,7 +61,6 @@ dataController.create = async (req, res, next) => {
   }
 };
 
-// SHOW: Only return plant if owned by user
 dataController.show = async (req, res, next) => {
   try {
     const plant = await Plant.findOne({

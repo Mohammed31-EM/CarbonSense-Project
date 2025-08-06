@@ -13,31 +13,23 @@ const PDFDocument = require('pdfkit');
  * @returns {Object} - Metrics data object.
  */
 async function reportGenerator(plantId, periodStart, periodEnd) {
-  // Validate plant
   const plant = await Plant.findById(plantId);
   if (!plant) throw new Error('Plant not found');
  
-  // Validate dates
   const startDate = new Date(periodStart);
   const endDate = new Date(periodEnd);
   if (isNaN(startDate) || isNaN(endDate)) throw new Error('Invalid date range');
   endDate.setHours(23,59,59,999)
   
- 
-
-  // Fetch equipment IDs for this plant
   const equipment = await Equipment.find({ plantId }).select('_id');
   const equipmentIds = equipment.map(eq => eq._id);
  
-  // Fetch readings for this plant's equipment within the time period
   const readings = await Reading.find({
     equipmentId: { $in: equipmentIds },
     timestamp: { $gte: startDate, $lte: endDate }
 
   });
-console.log('error checkinggggg: ', equipmentIds)
 
-  // Aggregate readings
   const metrics = {
     totalEmissions: readings.filter(r => r.parameter === 'emissions').reduce((sum, r) => sum + r.value, 0),
     totalEnergy: readings.filter(r => r.parameter === 'energy').reduce((sum, r) => sum + r.value, 0),
@@ -45,16 +37,13 @@ console.log('error checkinggggg: ', equipmentIds)
     waste: readings.filter(r => r.parameter === 'waste').reduce((sum, r) => sum + r.value, 0),
   };
 
-  // Calculate carbon footprint (basic formula)
   metrics.carbonFootprint = metrics.totalEmissions * 5;
 
-  // Ensure reports directory exists
   const reportsDir = path.join(__dirname, '../reports');
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
 
-  // Generate a text file report (async)
   const reportContent = `
     Sustainability Report - ${plant.name}
     Period: ${startDate.toDateString()} to ${endDate.toDateString()}

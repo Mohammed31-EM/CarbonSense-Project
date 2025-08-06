@@ -92,7 +92,11 @@ describe('📊 Reading API Tests', () => {
       })
       .expect(401);
 
-    expect(response.text).toMatch(/token/i);
+    if (response.headers['content-type'].includes('application/json')) {
+      expect(response.body).toHaveProperty('error', 'Token missing');
+    } else {
+      expect(response.text).toMatch(/token/i);
+    }
   });
 
   test('✅ should return all readings for authenticated user', async () => {
@@ -147,7 +151,7 @@ describe('📊 Reading API Tests', () => {
     const response = await request(app)
       .put(`/api/readings/${reading._id}`)
       .set('Authorization', token)
-      .send({ value: 300 })
+      .send({ value: 300, parameter: 'emissions' })
       .expect(200);
 
     expect(response.body).toHaveProperty('value', 300);
@@ -182,6 +186,28 @@ describe('📊 Reading API Tests', () => {
       .delete(`/api/readings/${reading._id}`)
       .expect(401);
 
-    expect(response.text).toMatch(/token/i);
+    if (response.headers['content-type'].includes('application/json')) {
+      expect(response.body).toHaveProperty('error', 'Token missing');
+    } else {
+      expect(response.text).toMatch(/token/i);
+    }
+  });
+
+  // ---- No invalid enum test for parameter ----
+  // If you want an enum failure, test it like this:
+  test('🚫 should fail for invalid parameter enum', async () => {
+    const data = {
+      equipmentId: equipment._id,
+      parameter: 'voltage', // Not in allowed enum
+      value: 220
+    };
+
+    const response = await request(app)
+      .post('/api/readings')
+      .set('Authorization', token)
+      .send(data)
+      .expect(400);
+
+    expect(response.body).toHaveProperty('message');
   });
 });

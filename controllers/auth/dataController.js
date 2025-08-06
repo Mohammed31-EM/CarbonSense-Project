@@ -2,23 +2,19 @@ const User = require('../../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'secret'; // For testing ONLY—replace in production!
+const JWT_SECRET = 'secret'; 
 
-// Helper to get bare JWT token from header or query
+
 function extractBearerToken(authHeaderOrToken) {
-  console.log('auth header token', authHeaderOrToken)
   if (!authHeaderOrToken) return null;
   return authHeaderOrToken.startsWith('Bearer ') ? authHeaderOrToken.slice(7) : authHeaderOrToken;
 }
 
-// Middleware: Authenticate via JWT
 exports.auth = async (req, res, next) => {
-  console.log('request', req.body)
   try {
     let token =
       extractBearerToken(req.header('Authorization')) ||
       extractBearerToken(req.query.token);
-      console.log('token', token)
 
     if (!token) return res.status(401).json({error: 'Token missing'});
 
@@ -35,7 +31,6 @@ exports.auth = async (req, res, next) => {
   }
 };
 
-// ✅ Create New User
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -61,8 +56,6 @@ exports.createUser = async (req, res) => {
 };
 
 
-
-// Login User
 exports.loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -76,7 +69,6 @@ exports.loginUser = async (req, res, next) => {
       { expiresIn: '1h' }
     );
 
-    // Remove password before sending user object
     const userObj = user.toObject();
     delete userObj.password;
 
@@ -97,7 +89,7 @@ exports.updateUser = async (req, res) => {
     updates.forEach(key => user[key] = req.body[key]);
     await user.save();
 
-    // Remove password before sending
+    
     const userObj = user.toObject();
     delete userObj.password;
 
@@ -107,7 +99,6 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Delete User
 exports.deleteUser = async (req, res) => {
   try {
     await req.user.deleteOne();
@@ -117,7 +108,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Get Profile
+
 exports.getProfile = async (req, res) => {
   try {
     const { password, ...userData } = req.user.toObject();

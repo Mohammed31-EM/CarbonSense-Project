@@ -1,4 +1,3 @@
-// API JSON response controller for Equipment
 
 const apiController = {
   index(req, res) {

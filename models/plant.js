@@ -5,7 +5,7 @@ const plantSchema = new mongoose.Schema({
   location: { type: String, required: true },
   emissions: { type: Number, required: true },
   status: { type: String, default: 'Active' },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } // 👈 Add this line
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Plant', plantSchema);

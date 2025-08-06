@@ -7,9 +7,6 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ SHOW: Show single reading
-   */
   show(req, res) {
     res.render('reading/Show', { 
       ...res.locals.data,
@@ -17,9 +14,6 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ EDIT: Show edit reading form
-   */
   edit(req, res) {
     res.render('reading/Edit', { 
       ...res.locals.data,
@@ -27,9 +21,6 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ NEW: Show form to create a new reading
-   */
   newView(req, res) {
     res.render('reading/New', { 
       ...res.locals.data,
@@ -37,9 +28,6 @@ const viewController = {
     });
   },
 
-  /**
-   * ✅ Redirect to main readings page
-   */
   redirectHome(req, res) {
     const token = req.query.token || res.locals.data?.token || '';
     if (token) {
@@ -49,9 +37,6 @@ const viewController = {
     }
   },
 
-  /**
-   * ✅ Redirect to a specific reading details page
-   */
   redirectShow(req, res) {
     const token = req.query.token || res.locals.data?.token || '';
     if (token) {

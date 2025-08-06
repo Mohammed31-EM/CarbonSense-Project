@@ -61,7 +61,7 @@ describe('Plant API Tests', () => {
       const response = await request(app)
         .get('/api/plants')
         .expect(401);
-      expect(response.text).toBe('Token missing');
+      expect(response.body).toHaveProperty('error', 'Token missing');
     });
   });
 
@@ -127,7 +127,7 @@ describe('Plant API Tests', () => {
         .send({ name: 'Plant D', location: 'Oman', emissions: 600 })
         .expect(401);
 
-      expect(response.text).toBe('Token missing');
+      expect(response.body).toHaveProperty('error', 'Token missing');
     });
   });
 
@@ -158,6 +158,22 @@ describe('Plant API Tests', () => {
       expect(response.body).toHaveProperty('name', updateData.name);
       expect(response.body).toHaveProperty('location', updateData.location);
       expect(response.body).toHaveProperty('emissions', updateData.emissions);
+    });
+
+    test('should return 401 on update if token is missing', async () => {
+      const plant = await Plant.create({
+        name: 'Plant X',
+        location: 'Nowhere',
+        emissions: 1,
+        user: userId
+      });
+
+      const response = await request(app)
+        .put(`/api/plants/${plant._id}`)
+        .send({ name: 'Updated X', location: 'Nowhere', emissions: 2 })
+        .expect(401);
+
+      expect(response.body).toHaveProperty('error', 'Token missing');
     });
   });
 
@@ -196,7 +212,7 @@ describe('Plant API Tests', () => {
         .delete(`/api/plants/${plant._id}`)
         .expect(401);
 
-      expect(response.text).toBe('Token missing');
+      expect(response.body).toHaveProperty('error', 'Token missing');
     });
   });
 });

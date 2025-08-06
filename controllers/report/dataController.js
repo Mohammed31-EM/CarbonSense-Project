@@ -71,7 +71,7 @@ dataController.create = async (req, res, next) => {
       try {
         metrics = await reportGenerator.generateReport(plantId, periodStart, periodEnd);
       } catch (err) {
-        console.warn("⚠️ Report generator failed, using default metrics for test.");
+        console.warn("Report generator failed, using default metrics for test.");
         metrics = {
           totalEmissions: 200,
           totalEnergy: 100,

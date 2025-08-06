@@ -3,14 +3,13 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../app');
-const server = app.listen(8086, () => console.log('Testing Maintenance on PORT 8086'));
-
 const User = require('../models/user');
 const Plant = require('../models/plant');
 const Equipment = require('../models/equipment');
 const Maintenance = require('../models/maintenance');
 
 let mongoServer;
+let server;
 let token, userId, plant, equipment;
 
 // Helper to register and login user, returns JWT and userId
@@ -23,12 +22,13 @@ async function registerAndLogin(email = 'john@test.com', password = 'pass123') {
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri());
+  server = app.listen(8086, () => console.log('Testing Maintenance on PORT 8086'));
 });
 
 afterAll(async () => {
   await mongoose.connection.close();
   await mongoServer.stop();
-  server.close();
+  await server.close();
 });
 
 beforeEach(async () => {
@@ -64,6 +64,8 @@ describe('Maintenance API Tests', () => {
       .post('/api/maintenance')
       .set('Authorization', token)
       .send({
+        title: 'Lubrication Job',
+        description: 'Lubricated bearings of the pump.',
         equipmentId: equipment._id,
         plantId: plant._id,
         tasksPerformed: ['Lubricate Bearings'],
@@ -74,10 +76,14 @@ describe('Maintenance API Tests', () => {
     expect(response.body).toHaveProperty('tasksPerformed');
     expect(response.body.tasksPerformed).toContain('Lubricate Bearings');
     expect(response.body.status).toBe('Pending');
+    expect(response.body).toHaveProperty('title', 'Lubrication Job');
+    expect(response.body).toHaveProperty('description', 'Lubricated bearings of the pump.');
   });
 
   test('should return all maintenance logs', async () => {
     await Maintenance.create({
+      title: 'Motor Inspection',
+      description: 'Inspected the main motor.',
       equipmentId: equipment._id,
       plantId: plant._id,
       tasksPerformed: ['Inspect Motor'],
@@ -91,10 +97,14 @@ describe('Maintenance API Tests', () => {
 
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThanOrEqual(1);
+    expect(response.body[0]).toHaveProperty('title');
+    expect(response.body[0]).toHaveProperty('description');
   });
 
   test('should get a single maintenance log by ID', async () => {
     const log = await Maintenance.create({
+      title: 'Motor Inspection',
+      description: 'Inspected the main motor.',
       equipmentId: equipment._id,
       plantId: plant._id,
       tasksPerformed: ['Inspect Motor'],
@@ -108,6 +118,8 @@ describe('Maintenance API Tests', () => {
 
     expect(response.body.tasksPerformed).toContain('Inspect Motor');
     expect(response.body.status).toBe('Pending');
+    expect(response.body).toHaveProperty('title', 'Motor Inspection');
+    expect(response.body).toHaveProperty('description', 'Inspected the main motor.');
   });
 
   test('should return 400 for non-existent maintenance log ID', async () => {
@@ -123,6 +135,8 @@ describe('Maintenance API Tests', () => {
 
   test('should update a maintenance log successfully', async () => {
     const log = await Maintenance.create({
+      title: 'Seal Testing',
+      description: 'Testing pump seal.',
       equipmentId: equipment._id,
       plantId: plant._id,
       tasksPerformed: ['Test Pump'],
@@ -133,6 +147,8 @@ describe('Maintenance API Tests', () => {
       .put(`/api/maintenance/${log._id}`)
       .set('Authorization', token)
       .send({
+        title: 'Seal Replacement',
+        description: 'Replaced main pump seal.',
         tasksPerformed: ['Replace Seal'],
         status: 'Completed'
       })
@@ -140,10 +156,14 @@ describe('Maintenance API Tests', () => {
 
     expect(response.body.tasksPerformed).toContain('Replace Seal');
     expect(response.body.status).toBe('Completed');
+    expect(response.body).toHaveProperty('title', 'Seal Replacement');
+    expect(response.body).toHaveProperty('description', 'Replaced main pump seal.');
   });
 
   test('should delete a maintenance log successfully', async () => {
     const log = await Maintenance.create({
+      title: 'Delete Test',
+      description: 'Testing delete functionality.',
       equipmentId: equipment._id,
       plantId: plant._id,
       tasksPerformed: ['Test Delete'],
@@ -166,6 +186,6 @@ describe('Maintenance API Tests', () => {
       .get('/api/maintenance')
       .expect(401);
 
-    expect(response.text).toBe('Token missing');
+    expect(response.body).toHaveProperty('error', 'Token missing');
   });
 });

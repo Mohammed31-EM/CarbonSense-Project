@@ -7,7 +7,7 @@ dataController.index = async (req, res, next) => {
   try {
     const logs = await Maintenance.find()
       .populate('equipmentId')
-      .populate('plantId'); // Only works if plantId exists in schema
+      .populate('plantId'); 
       res.locals.data = {maintenances: logs}
   if (req.originalUrl.includes('/api')) {
     return res.status(200).json(logs); 
@@ -18,7 +18,7 @@ dataController.index = async (req, res, next) => {
   }
 };
 
-// SHOW: Get single maintenance record
+
 dataController.show = async (req, res, next) => {
   try {
     const log = await Maintenance.findById(req.params.id)
@@ -36,7 +36,7 @@ dataController.show = async (req, res, next) => {
   }
 };
 
-// CREATE: Add new maintenance record
+
 dataController.create = async (req, res, next) => {
   try {
     if (!req.body.equipmentId || !req.body.plantId) {
@@ -55,7 +55,7 @@ dataController.create = async (req, res, next) => {
       notes: req.body.notes || '',
       nextScheduledDate: req.body.nextScheduledDate || null,
       status: req.body.status || 'Pending',
-      plantId: req.body.plantId // Only if you add plantId in schema
+      plantId: req.body.plantId 
     });
 
     if (!req.headers.accept || !req.headers.accept.includes('application/json')) {
@@ -72,7 +72,7 @@ dataController.create = async (req, res, next) => {
   }
 };
 
-// UPDATE
+
 dataController.update = async (req, res, next) => {
   try {
     const updatedLog = await Maintenance.findByIdAndUpdate(
@@ -92,7 +92,7 @@ dataController.update = async (req, res, next) => {
   }
 };
 
-// DELETE
+
 dataController.destroy = async (req, res, next) => {
   try {
     const deletedLog = await Maintenance.findByIdAndDelete(req.params.id);

@@ -57,7 +57,6 @@ router.post('/reports', userDataController.auth, reportDataController.create, re
 router.put('/reports/:id', userDataController.auth, reportDataController.update, reportApiController.update);
 router.delete('/reports/:id', userDataController.auth, reportDataController.destroy, reportApiController.destroy);
 
-// --- REPORT GENERATION ENDPOINT ---
 
 router.post('/reports/generate',authDataController.auth, async (req, res) => {
   try {

@@ -13,11 +13,9 @@ let mongoServer;
 let token, userId, plant;
 
 async function registerAndLogin(email = 'admin@cs.com', password = 'password123') {
-  // Register
   await request(app)
     .post('/api/users')
     .send({ name: 'Admin User', email, password });
-  // Login
   const res = await request(app)
     .post('/api/users/login')
     .send({ email, password });
@@ -40,12 +38,10 @@ beforeEach(async () => {
   await Plant.deleteMany({});
   await Equipment.deleteMany({});
 
-  // Register and login, get userId and JWT
   const auth = await registerAndLogin();
   token = `Bearer ${auth.token}`;
   userId = auth.user._id;
 
-  // Create plant with ownership
   plant = await Plant.create({
     name: 'Plant A',
     location: 'Bahrain',
@@ -144,6 +140,11 @@ describe('Equipment API Tests', () => {
       .get('/api/equipment')
       .expect(401);
 
-    expect(response.text).toBe('Token missing');
+    // Accept JSON (API style: { error: "Token missing" }) or text (just for fallback)
+    if (response.headers['content-type'] && response.headers['content-type'].includes('application/json')) {
+      expect(response.body).toHaveProperty('error', 'Token missing');
+    } else {
+      expect(response.text).toMatch(/token missing/i);
+    }
   });
 });

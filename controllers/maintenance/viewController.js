@@ -18,7 +18,6 @@ const viewController = {
     });
   },
 
-  // NEW: Fetch plants and equipment for dropdowns
   async newView(req, res) {
     try {
       const plants = await Plant.find().lean();
@@ -30,7 +29,7 @@ const viewController = {
     }
   },
 
-  // EDIT: Fetch plants/equipment as well
+  
   async edit(req, res) {
     try {
       const plants = await Plant.find().lean();

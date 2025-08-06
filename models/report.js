@@ -20,7 +20,7 @@ const reportSchema = new mongoose.Schema({
     waste: { type: Number, default: 0 },
     carbonFootprint: { type: Number, default: 0 }
   },
-  filePath: { type: String } // optional: PDF or CSV file location
+  filePath: { type: String } 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Report', reportSchema);

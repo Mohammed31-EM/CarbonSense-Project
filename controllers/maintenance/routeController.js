@@ -6,8 +6,6 @@ const apiController = require('./apiController')
 const dataController = require('./dataController');
 const viewController = require('./viewController');
 
-
-
 router.get('/new', authDataController.auth, viewController.newView);
 router.get('/:id/edit', authDataController.auth, dataController.show, viewController.edit);
 router.get('/', authDataController.auth, dataController.index, viewController.index);

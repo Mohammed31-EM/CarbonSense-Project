@@ -2,9 +2,7 @@ const Reading = require('../../models/reading');
 const {publishReading, publishPlant, publishEquipment } = require('../../utility/mqttClient')
 const dataController = {};
 
-/**
- * ✅ INDEX: Get all readings (optionally filtered by plant or equipment)
- */
+
 dataController.index = async (req, res) => {
   try {
     const filter = {};
@@ -21,9 +19,6 @@ dataController.index = async (req, res) => {
   }
 };
 
-/**
- * ✅ SHOW: Get a single reading by ID
- */
 dataController.show = async (req, res) => {
   try {
     const reading = await Reading.findById(req.params.id)
@@ -38,9 +33,7 @@ dataController.show = async (req, res) => {
   }
 };
 
-/**
- * ✅ CREATE: Add a new reading
- */
+
 dataController.create = async (req, res) => {
   try {
     // Basic validation
@@ -48,7 +41,6 @@ dataController.create = async (req, res) => {
       return res.status(400).json({ message: 'equipmentId, parameter, and value are required' });
     }
 
-    // Auto-assign status based on value (optional threshold logic)
     let status = 'Normal';
     if (req.body.parameter === 'emissions' && req.body.value > 100) status = 'Warning';
     if (req.body.parameter === 'emissions' && req.body.value > 500) status = 'Critical';
@@ -75,9 +67,7 @@ dataController.create = async (req, res) => {
   }
 };
 
-/**
- * ✅ UPDATE: Edit an existing reading
- */
+
 dataController.update = async (req, res) => {
   try {
     const updatedReading = await Reading.findByIdAndUpdate(
@@ -98,9 +88,6 @@ dataController.update = async (req, res) => {
   }
 };
 
-/**
- * ✅ DELETE: Remove a reading
- */
 dataController.destroy = async (req, res) => {
   try {
     const deletedReading = await Reading.findByIdAndDelete(req.params.id);

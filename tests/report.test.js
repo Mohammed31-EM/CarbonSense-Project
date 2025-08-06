@@ -7,9 +7,12 @@ const User = require('../models/user');
 const Plant = require('../models/plant');
 const Report = require('../models/report');
 
+
+
 let server;
 let mongoServer;
 let token, userId, plant;
+
 
 // Helper: Register and login, return JWT and userId
 async function registerAndLoginUser() {
@@ -23,6 +26,12 @@ async function registerAndLoginUser() {
   return res.body.token;
 }
 
+// ---- (Optional) Silence logs during test runs ----
+beforeAll(() => {
+  jest.spyOn(console, 'log').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri());
@@ -33,9 +42,9 @@ afterAll(async () => {
   await Report.deleteMany({});
   await Plant.deleteMany({});
   await User.deleteMany({});
-  await mongoose.disconnect();
   if (mongoServer) await mongoServer.stop();
   await server.close();
+
 });
 
 beforeEach(async () => {

@@ -3,7 +3,6 @@ const User = require('../../models/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-// API Authentication middleware - uses headers instead of query params
 exports.auth = async (req, res, next) => {
   
   try {
@@ -20,10 +19,9 @@ exports.auth = async (req, res, next) => {
   }
 }
 
-// API User creation
+
 exports.createUser = async (req, res) => {
   try {
-    // Validate required fields
     if (!req.body.name || !req.body.email || !req.body.password) {
       return res.status(400).json({ message: 'Name, email, and password are required' })
     }
@@ -37,7 +35,6 @@ exports.createUser = async (req, res) => {
   }
 }
 
-// API User login
 exports.loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email })
@@ -51,7 +48,6 @@ exports.loginUser = async (req, res) => {
   }
 }
 
-// API User update
 exports.updateUser = async (req, res) => {
   try {
     const updates = Object.keys(req.body)
@@ -67,7 +63,6 @@ exports.updateUser = async (req, res) => {
   }
 }
 
-// API User deletion
 exports.deleteUser = async (req, res) => {
   try {
     await req.user.deleteOne()
@@ -77,7 +72,6 @@ exports.deleteUser = async (req, res) => {
   }
 }
 
-// API Get user profile
 exports.getProfile = async (req, res) => {
   try {
     res.json({ user: req.user})

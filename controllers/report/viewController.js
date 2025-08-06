@@ -3,7 +3,6 @@ const Plant = require('../../models/plant');
 const RESOURCE_PATH = ('/report')
 
 const viewController = { 
-  // INDEX: List all reports
   index(req, res) {
     res.render('report/Index', { 
       reports: res.locals.data,
@@ -11,7 +10,6 @@ const viewController = {
     });
   },
 
-  // SHOW: Show single report
   show(req, res) {
     res.render('report/Show', { 
       reports: res.locals.data,
@@ -19,7 +17,6 @@ const viewController = {
     });
   },
 
-  // EDIT: Show edit report form
   edit(req, res) {
     res.render('report/Edit', { 
       reports: res.locals.data,
@@ -27,7 +24,6 @@ const viewController = {
     });
   },
 
-  // NEW: Show form to create a new report (NOW fetches plants)
   async newView(req, res) {
     try {
       const plants = await Plant.find().lean();
@@ -38,7 +34,6 @@ const viewController = {
     }
   },
 
-  // Redirect to main reports page
   redirectHome(req, res) {
      token =
       req.query.token ||
@@ -51,7 +46,6 @@ const viewController = {
     }
   },
 
-  // Redirect to a specific report details page
   redirectShow(req, res) {
     const token = req.query.token || '';
     if (token) {
