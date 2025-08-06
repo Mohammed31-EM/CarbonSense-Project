@@ -1,11 +1,12 @@
 require('dotenv').config()
 const mqtt = require('mqtt');
+const Reading = require('../models/reading')
 
 // Use environment variables for credentials for security
 const MQTT_BROKER = process.env.MQTT_BROKER || '5017366e502b4a20a0d696a96d97570b.s1.eu.hivemq.cloud';
 const MQTT_PORT = process.env.MQTT_PORT || 8883;
-const MQTT_USERNAME = process.env.MQTT_USERNAME || 'your-hivemq-username';
-const MQTT_PASSWORD = process.env.MQTT_PASSWORD || 'your-hivemq-password';
+const MQTT_USERNAME = process.env.MQTT_USERNAME ;
+const MQTT_PASSWORD = process.env.MQTT_PASSWORD ;
 
 // Construct URL for TLS
 const brokerUrl = `mqtts://${MQTT_BROKER}:${MQTT_PORT}`;
@@ -31,13 +32,21 @@ client.on('connect', () => {
   });
 });
 
-client.on('message', (topic, message) => {
+client.on('message', async (topic, message) => {
   if (topic === 'plant1/temperature') {
     // Handle new reading message (JSON)
     try {
       const reading = JSON.parse(message.toString());
       console.log('📥 New Reading Received via MQTT:', reading);
-      // You can add logic here to update DB, notify users, etc.
+      
+      await Reading.create({
+        equipmentId: reading.equipmentId,
+        parameter: reading.parameter,
+        value: reading.value,
+        timestamp: reading.timestamp ? new Date(reading.timestamp * 1000) : new Date(),
+
+      })
+      
     } catch (err) {
       console.error('❌ Failed to parse MQTT reading:', err.message);
     }

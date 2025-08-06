@@ -13,7 +13,7 @@ const readingSchema = new mongoose.Schema({
   },
   parameter: { 
     type: String, 
-    enum: ['energy', 'emissions', 'water', 'waste'], 
+    enum: ['energy', 'emissions', 'water', 'waste', 'temperature'], 
     required: true 
   },
   value: { type: Number, required: true },

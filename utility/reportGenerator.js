@@ -15,21 +15,24 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
   // Validate plant
   const plant = await Plant.findById(plantId);
   if (!plant) throw new Error('Plant not found');
-
+ 
   // Validate dates
   const startDate = new Date(periodStart);
   const endDate = new Date(periodEnd);
   if (isNaN(startDate) || isNaN(endDate)) throw new Error('Invalid date range');
+  endDate.setHours(23,59,59,999)
+  
 
   // Fetch equipment IDs for this plant
   const equipment = await Equipment.find({ plantId }).select('_id');
   const equipmentIds = equipment.map(eq => eq._id);
-
+ 
   // Fetch readings for this plant's equipment within the time period
   const readings = await Reading.find({
     equipmentId: { $in: equipmentIds },
     timestamp: { $gte: startDate, $lte: endDate }
   });
+
 
   // Aggregate readings
   const metrics = {
@@ -60,6 +63,7 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
     Waste Generated: ${metrics.waste} kg
     Carbon Footprint: ${metrics.carbonFootprint} CO₂-e
   `;
+  
 
   const filePath = path.join(reportsDir, `report_${plantId}_${Date.now()}.txt`);
   try {
@@ -67,8 +71,8 @@ async function reportGenerator(plantId, periodStart, periodEnd) {
   } catch (err) {
     throw new Error('Failed to write report file: ' + err.message);
   }
-
-  return { ...metrics, filePath };
+  const filename = path.basename(filePath)
+  return { ...metrics, filename};
 }
 
 module.exports = reportGenerator;

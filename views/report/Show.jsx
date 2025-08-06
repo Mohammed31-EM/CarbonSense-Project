@@ -3,6 +3,7 @@ const Layout = require('../layouts/Layout');
 
 function Show({ report, token }) {
   // Defensive: If report not found
+  const filename = report.filePath ? report.filePath.split(/[\\/]/).pop(): '';
   if (!report) {
     return (
       <Layout title="Report Not Found" token={token}>
@@ -24,10 +25,10 @@ function Show({ report, token }) {
         <p><strong>Water Usage:</strong> {report.metrics?.waterUsage ?? 0} m³</p>
         <p><strong>Waste:</strong> {report.metrics?.waste ?? 0} kg</p>
         <p><strong>Carbon Footprint:</strong> {report.metrics?.carbonFootprint ?? 0} CO₂eq</p>
-        {report.filePath && (
+        {report.filename && (
           <p>
-            <a href={report.filePath} target="_blank" rel="noopener noreferrer">
-              📂 Download Report File
+            <a href={`/reports/download?file=${encodeURIComponent(report.filename)}`} className="btn btn-primary" download>
+              📂 Download Report
             </a>
           </p>
         )}

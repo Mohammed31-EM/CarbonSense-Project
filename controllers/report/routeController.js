@@ -1,10 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path')
+const fs = require('fs')
 
 const dataController = require('./dataController');
 const apiController = require('./apiController');
 const viewController = require('./viewController'); 
 const authDataController = require('../auth/dataController');
+
+router.get('/download', (req, res) => {
+    console.log('clicked download')
+  const file = req.query.file;
+  if (!file) return res.status(400).send('No file specified.');
+
+  const filePath = path.join(__dirname, '../../reports', file);
+  if (!fs.existsSync(filePath)) return res.status(404).send('File not found.');
+
+  res.download(filePath, file, err => {
+    if (err) res.status(500).send('Error downloading file.');
+  });
+});
 
 // --- Web Views ---
 router.get('/new', authDataController.auth, viewController.newView); 
@@ -23,6 +38,5 @@ router.put('/api/:id', authDataController.auth, dataController.update, apiContro
 router.delete('/api/:id', authDataController.auth, dataController.destroy, apiController.destroy);
 
 // --- Custom Endpoint for report generation via AJAX ---
-
 
 module.exports = router;

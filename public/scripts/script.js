@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <li>Water Usage: ${data.waterUsage ?? 0} L</li>
             <li>Waste: ${data.waste ?? 0} kg</li>
             <li>Carbon Footprint: ${data.carbonFootprint ?? 0} CO₂-e</li>
-            ${data.filePath ? `<li>File: <a href="${data.filePath}" target="_blank">Download Report</a></li>` : ''}
+            ${data.filename ? `<li>File: <a href="/reports/download?file=${encodeURIComponent(data.filename)}" target="_blank">Download Report</a></li>` : ''}
           </ul>
         `;
       } else {
