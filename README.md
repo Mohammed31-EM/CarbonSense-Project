@@ -1,10 +1,48 @@
 # 🌱 CarbonSense: IoT-Driven Emission and Energy Monitoring Platform
 
 ## 📌 Overview
-**CarbonSense** is a full-stack web application designed for the **chemical and petrochemical industries** to track and manage **carbon emissions, energy consumption, water usage, and sustainability KPIs** in real time.  
 
-This platform integrates **IoT sensor data via MQTT**, provides **interactive dashboards**, enables **predictive maintenance**, and generates **automated sustainability compliance reports** to help industries progress towards **carbon neutrality goals**.
+*CarbonSense* is a robust full-stack web application for the chemical and petrochemical industries, enabling real-time monitoring and management of *carbon emissions, energy consumption, water usage, and sustainability KPIs*.  
+It seamlessly integrates *IoT sensor data via MQTT, features interactive dashboards, predictive maintenance, and generates automated compliance reports to help industry teams progress toward **carbon neutrality*.
 
+---
+
+## 🏗 Architecture Diagram
+
+```text
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           CarbonSense System                             │
+├────────────┬─────────────────────────────┬───────────────────────────────┤
+│ IoT/Field  │        Backend (API)        │          Frontend (SSR)       │
+│  Devices   │      Node.js + Express      │         JSX Views             │
+│ (ESP32,    │        + MQTT Client        │   (Server-Side Rendering)     │
+│  sensors)  │                             │                               │
+├────────────┼─────────────────────────────┼───────────────────────────────┤
+│            │                             │                               │
+│ ┌───────┐  │   ┌────────────────────┐    │   ┌──────────────┐            │
+│ │Sensor │──┼──►│   MQTT Broker      │◄───┼──►│Dashboard UI  │            │
+│ │Device │  │   │   (HiveMQ Cloud)   │    │   └────▲─────────┘            │
+│ └───────┘  │   └─────────┬──────────┘    │        │                      │
+│            │             │               │    Tables,Forms               │
+│ ┌───────┐  │      MQTT   │               │         (JSX)                 │
+│ │Sensor │──┼─────────────┘               │                               │
+│ └───────┘  │                             │                               │
+│            │       ┌─────────────────────────────┐                       │
+│            │       │   Express REST API          │                       │
+│            │       │ /api/users, /api/plants,    │                       │
+│            │       │ /api/equipment, etc         │                       │
+│            │       └─────────▲───────────────────┘                       │
+│            │                 │                                           │
+│            │         ┌───────┴──────┐                                    │
+│            │         │   MongoDB    │                                    │
+│            │         │ (Atlas/Local)│                                    │
+│            │         └──────────────┘                                    │
+└────────────┴─────────────────────────────────────────────────────────────┘
+```
+- IoT devices send data via MQTT to the backend.
+- Backend listens for MQTT and REST API requests, stores all data in MongoDB.
+- Server-side JSX views provide dashboards, KPIs, CRUD, and reports.
+- All authentication, reporting, and maintenance handled by backend controllers.
 ---
 
 ## 🚀 Features
