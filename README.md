@@ -23,9 +23,9 @@ It seamlessly integrates *IoT sensor data via MQTT, features interactive dashboa
 │ │Sensor │──┼──►│   MQTT Broker      │◄───┼──►│Dashboard UI  │            │
 │ │Device │  │   │   (HiveMQ Cloud)   │    │   └────▲─────────┘            │
 │ └───────┘  │   └─────────┬──────────┘    │        │                      │
-│            │             │               │    Charts,Tables,Forms        │
+│            │             │               │    Tables,Forms               │
 │ ┌───────┐  │      MQTT   │               │         (JSX)                 │
-│ │Sensor │──┼──────────────┘               │                              │
+│ │Sensor │──┼─────────────┘               │                               │
 │ └───────┘  │                             │                               │
 │            │       ┌─────────────────────────────┐                       │
 │            │       │   Express REST API          │                       │
